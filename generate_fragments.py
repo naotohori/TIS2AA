@@ -104,24 +104,36 @@ def calc_pucker(res, res_next):
             2 = 2'-end
             3 = 3'-end
     '''
-    for a in res.atoms:
-        if a.name.strip() == "C5%s" % SUGAR_MARK:
-            xyzC5 = a.xyz.get_as_ndarray()
-        elif a.name.strip() == "C4%s" % SUGAR_MARK:
-            xyzC4 = a.xyz.get_as_ndarray()
-        elif a.name.strip() == "C3%s" % SUGAR_MARK:
-            xyzC3 = a.xyz.get_as_ndarray()
-        elif a.name.strip() == "O3%s" % SUGAR_MARK:
-            xyzO3 = a.xyz.get_as_ndarray()
-        elif a.name.strip() == "C1%s" % SUGAR_MARK:
-            xyzC1 = a.xyz.get_as_ndarray()
-        elif ((a.name.strip() == "N1" and a.res_name.strip() in ("U","C")) or
-              (a.name.strip() == "N9" and a.res_name.strip() in ("A","G")) ):
-            xyzN1N9 = a.xyz.get_as_ndarray()
+    xyzC5 = res.find_atom_by_name("C5%s" % SUGAR_MARK).xyz.get_as_ndarray()
+    xyzC4 = res.find_atom_by_name("C4%s" % SUGAR_MARK).xyz.get_as_ndarray()
+    xyzC3 = res.find_atom_by_name("C3%s" % SUGAR_MARK).xyz.get_as_ndarray()
+    xyzO3 = res.find_atom_by_name("O3%s" % SUGAR_MARK).xyz.get_as_ndarray()
+    xyzC1 = res.find_atom_by_name("C1%s" % SUGAR_MARK).xyz.get_as_ndarray()
+    if res.atoms[0].res_name.strip() in ("U", "C"):
+        xyzN1N9 = res.find_atom_by_name("N1").xyz.get_as_ndarray()
+    elif res.atoms[0].res_name.strip() in ("A", "G"):
+        xyzN1N9 = res.find_atom_by_name("N9").xyz.get_as_ndarray()
 
-    for a in res_next.atoms:
-        if a.name.strip() == "P":
-            xyzP_next = a.xyz.get_as_ndarray()
+#    for a in res.atoms:
+#        if a.name.strip() == "C5%s" % SUGAR_MARK:
+#            xyzC5 = a.xyz.get_as_ndarray()
+#        elif a.name.strip() == "C4%s" % SUGAR_MARK:
+#            xyzC4 = a.xyz.get_as_ndarray()
+#        elif a.name.strip() == "C3%s" % SUGAR_MARK:
+#            xyzC3 = a.xyz.get_as_ndarray()
+#        elif a.name.strip() == "O3%s" % SUGAR_MARK:
+#            xyzO3 = a.xyz.get_as_ndarray()
+#        elif a.name.strip() == "C1%s" % SUGAR_MARK:
+#            xyzC1 = a.xyz.get_as_ndarray()
+#        elif ((a.name.strip() == "N1" and a.res_name.strip() in ("U","C")) or
+#              (a.name.strip() == "N9" and a.res_name.strip() in ("A","G")) ):
+#            xyzN1N9 = a.xyz.get_as_ndarray()
+
+    
+    xyzP_next = res_next.find_atom_by_name("P").xyz.get_as_ndarray()
+#    for a in res_next.atoms:
+#        if a.name.strip() == "P":
+#            xyzP_next = a.xyz.get_as_ndarray()
 
     delta = torsion(xyzC5, xyzC4, xyzC3, xyzO3, flg_degree=True, flg_360=True)
 

@@ -46,7 +46,11 @@ def check_necessary_atoms_exist(res, res_name):
          atomnames.count("C4%s" % SUGAR_MARK) != 1 or atomnames.count("O4%s" % SUGAR_MARK) != 1 or
          atomnames.count("C3%s" % SUGAR_MARK) != 1 or atomnames.count("O3%s" % SUGAR_MARK) != 1 or
          atomnames.count("C2%s" % SUGAR_MARK) != 1 or atomnames.count("O2%s" % SUGAR_MARK) != 1 or
-         atomnames.count("C1%s" % SUGAR_MARK) != 1 ):
+         atomnames.count("C1%s" % SUGAR_MARK) != 1 or
+         atomnames.count("H5%s" % SUGAR_MARK) != 1 or atomnames.count("H5%s%s" % (SUGAR_MARK,SUGAR_MARK)) != 1 or
+         atomnames.count("H4%s" % SUGAR_MARK) != 1 or atomnames.count("H3%s" % SUGAR_MARK) != 1 or
+         atomnames.count("H2%s" % SUGAR_MARK) != 1 or atomnames.count("HO2%s" % SUGAR_MARK) != 1 or
+         atomnames.count("H1%s" % SUGAR_MARK) != 1 ):
         return False
 
     # Base 
@@ -464,14 +468,13 @@ if __name__ == "__main__":
                 f_out.write('\n')
     
     
-    print '#PDB files: ', len(pdbfiles)
-    print '#residues: ', len(seq)
-    print 'restype filter: ',sum(flg_restype)
-    print 'number-of-atoms filter: ', sum(flg_natom)
-    print 'B-factor filter: ', sum(flg_Bfact)
-    print 'Terminal filter: ', sum(flg_noterm)
-    print 'atomtype filter: ', sum(flg_atoms)
-    print 'Final: ', sum(flg_final)
-    print '    2: ', puckers.count(2)
-    print '    3: ', puckers.count(3)
-
+    f_out.write( '# PDB files: %i\n' %  len(pdbfiles) )
+    f_out.write( '# residues : %i\n' % len(seq) )
+    f_out.write( '# restype filter: %i\n' % sum(flg_restype) )
+    f_out.write( '# number-of-atoms filter: %i\n' % sum(flg_natom) )
+    f_out.write( '# B-factor filter: %i\n' % sum(flg_Bfact) )
+    f_out.write( '# Terminal filter: %i\n' % sum(flg_noterm) )
+    f_out.write( '# atomtype filter: %i\n' % sum(flg_atoms) )
+    f_out.write( '# Final: %i\n' % sum(flg_final) )
+    f_out.write( '#     2: %i\n' % puckers.count(2) )
+    f_out.write( '#     3: %i\n' % puckers.count(3) )

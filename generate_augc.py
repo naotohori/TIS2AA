@@ -8,17 +8,18 @@ LISTFILE = 'RNA09.nts'
 from cafysis.file_io.pdb import PdbFile
 from cafysis.elements.pdb import Chain, Residue
 from cafysis.mtx_coord_transform import mtx_crd_transform
-#import py_bestfit
 from CalcROT import calcrotation
 import copy
 import numpy as np
-import sys
 
+## Coordinates of C1', N9/N1, C4/C2 of nab/[augc].pdb
 base3_A = [[7.514,4.080,7.390],[6.275,3.365,7.010],[5.089,3.947,6.630]]
 base3_G = [[7.514,4.080,7.390],[6.275,3.365,7.010],[5.082,3.956,6.630]]
 base3_U = [[7.514,4.080,7.390],[6.275,3.365,7.010],[5.189,4.127,6.660]]
 base3_C = [[7.514,4.080,7.390],[6.275,3.365,7.010],[5.166,4.124,6.660]]
 
+
+## Prepare standard base configurations from nab/[augc]_base.pdb
 p = PdbFile('nab/a_base.pdb')
 p.open_to_read()
 chains = p.read_all()
@@ -41,8 +42,8 @@ p = PdbFile('nab/c_base.pdb')
 p.open_to_read()
 chains = p.read_all()
 p.close()
-#res_base_C = chains[0].residues[0]
 res_base_C = copy.deepcopy( chains[0].residues[0] )
+
 
 def generate_atom(res, names, newname, chain_id, res_seq):
     a = False
@@ -79,49 +80,70 @@ for l in open(LISTFILE):
     ################# Backbone of Residue 1 ####################
     r = Residue()
     r.push_atom( generate_atom(r1, ("P",), " P  ", 1, 1) )
-    r.push_atom( generate_atom(r1, ("O1P","OP1"), " OP1", 1, 1) )
-    r.push_atom( generate_atom(r1, ("O2P","OP2"), " OP2", 1, 1) )
-    r.push_atom( generate_atom(r1, ("O5'","O5*"), " O5'", 1, 1) )
-    r.push_atom( generate_atom(r1, ("C5'","C5*"), " C5'", 1, 1) )
-    r.push_atom( generate_atom(r1, ("C4'","C4*"), " C4'", 1, 1) )
-    r.push_atom( generate_atom(r1, ("O4'","O4*"), " O4'", 1, 1) )
-    r.push_atom( generate_atom(r1, ("C3'","C3*"), " C3'", 1, 1) )
-    r.push_atom( generate_atom(r1, ("O3'","O3*"), " O3'", 1, 1) )
-    r.push_atom( generate_atom(r1, ("C2'","C2*"), " C2'", 1, 1) )
-    r.push_atom( generate_atom(r1, ("O2'","O2*"), " O2'", 1, 1) )
-    r.push_atom( generate_atom(r1, ("C1'","C1*"), " C1'", 1, 1) )
+    r.push_atom( generate_atom(r1, ("O1P", "OP1" ), " OP1", 1, 1) )
+    r.push_atom( generate_atom(r1, ("O2P", "OP2" ), " OP2", 1, 1) )
+    r.push_atom( generate_atom(r1, ("O5'", "O5*" ), " O5'", 1, 1) )
+    r.push_atom( generate_atom(r1, ("C5'", "C5*" ), " C5'", 1, 1) )
+    r.push_atom( generate_atom(r1, ("C4'", "C4*" ), " C4'", 1, 1) )
+    r.push_atom( generate_atom(r1, ("O4'", "O4*" ), " O4'", 1, 1) )
+    r.push_atom( generate_atom(r1, ("C3'", "C3*" ), " C3'", 1, 1) )
+    r.push_atom( generate_atom(r1, ("O3'", "O3*" ), " O3'", 1, 1) )
+    r.push_atom( generate_atom(r1, ("C2'", "C2*" ), " C2'", 1, 1) )
+    r.push_atom( generate_atom(r1, ("O2'", "O2*" ), " O2'", 1, 1) )
+    r.push_atom( generate_atom(r1, ("C1'", "C1*" ), " C1'", 1, 1) )
+    r.push_atom( generate_atom(r1, ("H5'", "H5*" ), "H5' ", 1, 1) )
+    r.push_atom( generate_atom(r1, ("H5''","H5**"), "H5''", 1, 1) )
+    r.push_atom( generate_atom(r1, ("H4'", "H4*" ), "H4' ", 1, 1) )
+    r.push_atom( generate_atom(r1, ("H3'", "H3*" ), "H3' ", 1, 1) )
+    r.push_atom( generate_atom(r1, ("H2'", "H2*" ), "H2' ", 1, 1) )
+    r.push_atom( generate_atom(r1, ("HO2'","HO2*"), "HO2'", 1, 1) )
+    r.push_atom( generate_atom(r1, ("H1'", "H1*" ), "H1' ", 1, 1) )
     c.push_residue(r)
 
     ################# Backbone of Residue 2 ####################
     r = Residue()
     r.push_atom( generate_atom(r2, ("P",), " P  ", 1, 2) )
-    r.push_atom( generate_atom(r2, ("O1P","OP1"), " OP1", 1, 2) )
-    r.push_atom( generate_atom(r2, ("O2P","OP2"), " OP2", 1, 2) )
-    r.push_atom( generate_atom(r2, ("O5'","O5*"), " O5'", 1, 2) )
-    r.push_atom( generate_atom(r2, ("C5'","C5*"), " C5'", 1, 2) )
-    r.push_atom( generate_atom(r2, ("C4'","C4*"), " C4'", 1, 2) )
-    r.push_atom( generate_atom(r2, ("O4'","O4*"), " O4'", 1, 2) )
-    r.push_atom( generate_atom(r2, ("C3'","C3*"), " C3'", 1, 2) )
-    r.push_atom( generate_atom(r2, ("O3'","O3*"), " O3'", 1, 2) )
-    r.push_atom( generate_atom(r2, ("C2'","C2*"), " C2'", 1, 2) )
-    r.push_atom( generate_atom(r2, ("O2'","O2*"), " O2'", 1, 2) )
-    r.push_atom( generate_atom(r2, ("C1'","C1*"), " C1'", 1, 2) )
+    r.push_atom( generate_atom(r2, ("O1P", "OP1" ), " OP1", 1, 2) )
+    r.push_atom( generate_atom(r2, ("O2P", "OP2" ), " OP2", 1, 2) )
+    r.push_atom( generate_atom(r2, ("O5'", "O5*" ), " O5'", 1, 2) )
+    r.push_atom( generate_atom(r2, ("C5'", "C5*" ), " C5'", 1, 2) )
+    r.push_atom( generate_atom(r2, ("C4'", "C4*" ), " C4'", 1, 2) )
+    r.push_atom( generate_atom(r2, ("O4'", "O4*" ), " O4'", 1, 2) )
+    r.push_atom( generate_atom(r2, ("C3'", "C3*" ), " C3'", 1, 2) )
+    r.push_atom( generate_atom(r2, ("O3'", "O3*" ), " O3'", 1, 2) )
+    r.push_atom( generate_atom(r2, ("C2'", "C2*" ), " C2'", 1, 2) )
+    r.push_atom( generate_atom(r2, ("O2'", "O2*" ), " O2'", 1, 2) )
+    r.push_atom( generate_atom(r2, ("C1'", "C1*" ), " C1'", 1, 2) )
+    r.push_atom( generate_atom(r2, ("H5'", "H5*" ), "H5' ", 1, 2) )
+    r.push_atom( generate_atom(r2, ("H5''","H5**"), "H5''", 1, 2) )
+    r.push_atom( generate_atom(r2, ("H4'", "H4*" ), "H4' ", 1, 2) )
+    r.push_atom( generate_atom(r2, ("H3'", "H3*" ), "H3' ", 1, 2) )
+    r.push_atom( generate_atom(r2, ("H2'", "H2*" ), "H2' ", 1, 2) )
+    r.push_atom( generate_atom(r2, ("HO2'","HO2*"), "HO2'", 1, 2) )
+    r.push_atom( generate_atom(r2, ("H1'", "H1*" ), "H1' ", 1, 2) )
     c.push_residue(r)
 
     ################# Backbone of Residue 3 ####################
     r = Residue()
     r.push_atom( generate_atom(r3, ("P",), " P  ", 1, 3) )
-    r.push_atom( generate_atom(r3, ("O1P","OP1"), " OP1", 1, 3) )
-    r.push_atom( generate_atom(r3, ("O2P","OP2"), " OP2", 1, 3) )
-    r.push_atom( generate_atom(r3, ("O5'","O5*"), " O5'", 1, 3) )
-    r.push_atom( generate_atom(r3, ("C5'","C5*"), " C5'", 1, 3) )
-    r.push_atom( generate_atom(r3, ("C4'","C4*"), " C4'", 1, 3) )
-    r.push_atom( generate_atom(r3, ("O4'","O4*"), " O4'", 1, 3) )
-    r.push_atom( generate_atom(r3, ("C3'","C3*"), " C3'", 1, 3) )
-    r.push_atom( generate_atom(r3, ("O3'","O3*"), " O3'", 1, 3) )
-    r.push_atom( generate_atom(r3, ("C2'","C2*"), " C2'", 1, 3) )
-    r.push_atom( generate_atom(r3, ("O2'","O2*"), " O2'", 1, 3) )
-    r.push_atom( generate_atom(r3, ("C1'","C1*"), " C1'", 1, 3) )
+    r.push_atom( generate_atom(r3, ("O1P", "OP1" ), " OP1", 1, 3) )
+    r.push_atom( generate_atom(r3, ("O2P", "OP2" ), " OP2", 1, 3) )
+    r.push_atom( generate_atom(r3, ("O5'", "O5*" ), " O5'", 1, 3) )
+    r.push_atom( generate_atom(r3, ("C5'", "C5*" ), " C5'", 1, 3) )
+    r.push_atom( generate_atom(r3, ("C4'", "C4*" ), " C4'", 1, 3) )
+    r.push_atom( generate_atom(r3, ("O4'", "O4*" ), " O4'", 1, 3) )
+    r.push_atom( generate_atom(r3, ("C3'", "C3*" ), " C3'", 1, 3) )
+    r.push_atom( generate_atom(r3, ("O3'", "O3*" ), " O3'", 1, 3) )
+    r.push_atom( generate_atom(r3, ("C2'", "C2*" ), " C2'", 1, 3) )
+    r.push_atom( generate_atom(r3, ("O2'", "O2*" ), " O2'", 1, 3) )
+    r.push_atom( generate_atom(r3, ("C1'", "C1*" ), " C1'", 1, 3) )
+    r.push_atom( generate_atom(r3, ("H5'", "H5*" ), "H5' ", 1, 3) )
+    r.push_atom( generate_atom(r3, ("H5''","H5**"), "H5''", 1, 3) )
+    r.push_atom( generate_atom(r3, ("H4'", "H4*" ), "H4' ", 1, 3) )
+    r.push_atom( generate_atom(r3, ("H3'", "H3*" ), "H3' ", 1, 3) )
+    r.push_atom( generate_atom(r3, ("H2'", "H2*" ), "H2' ", 1, 3) )
+    r.push_atom( generate_atom(r3, ("HO2'","HO2*"), "HO2'", 1, 3) )
+    r.push_atom( generate_atom(r3, ("H1'", "H1*" ), "H1' ", 1, 3) )
     c.push_residue(r)
 
 

@@ -14,13 +14,6 @@ import copy
 import numpy as np
 
 
-""" Coordinates of C1', N9/N1, C4/C2 of nab/[augc].pdb """
-base3_A = [[7.514,4.080,7.390],[6.275,3.365,7.010],[5.089,3.947,6.630]]
-base3_G = [[7.514,4.080,7.390],[6.275,3.365,7.010],[5.082,3.956,6.630]]
-base3_U = [[7.514,4.080,7.390],[6.275,3.365,7.010],[5.189,4.127,6.660]]
-base3_C = [[7.514,4.080,7.390],[6.275,3.365,7.010],[5.166,4.124,6.660]]
-
-
 """ Prepare standard base configurations from nab/[augc]_base.pdb """
 p = PdbFile('nab/a_base.pdb')
 p.open_to_read()
@@ -45,6 +38,26 @@ p.open_to_read()
 chains = p.read_all()
 p.close()
 res_base_C = copy.deepcopy( chains[0].residues[0] )
+
+
+def xyz_list(res, names):
+    xyzs = []
+    for name in names:
+        xyzs.append( res.find_atom_by_name(name).xyz.get_as_list() )
+    return xyzs
+
+
+""" Coordinates for superpositioning """
+xyzs_A = xyz_list( res_base_A, ("N9", "C8", "N7", "C6", "N6", "C5", "C4", "N3", "C2", "N1"))
+xyzs_U = xyz_list( res_base_U, ("C6", "C5", "C4", "O4", "N3", "C2", "O2", "N1"))
+xyzs_G = xyz_list( res_base_G, ("N9", "C8", "N7", "C6", "O6", "C5", "C4", "N3", "C2", "N2", "N1"))
+xyzs_C = xyz_list( res_base_C, ("C6", "C5", "C4", "N4", "N3", "C2", "O2", "N1"))
+""" Add the position of C1' """
+xyzs_A.append( [7.514,4.080,7.390] )
+xyzs_U.append( [7.514,4.080,7.390] )
+xyzs_G.append( [7.514,4.080,7.390] )
+xyzs_C.append( [7.514,4.080,7.390] )
+
 
 
 def generate_atom(res, names, newname, chain_id, res_seq, element):
@@ -156,28 +169,20 @@ for l in open(LISTFILE):
     """# Super position #"""
     """##################"""
 
-    """ Prepare the three atoms (C1', N9/N1, C4/C2) """
-    base3 = []
-
-    base3.append( c.residues[1].atoms[-1].xyz.get_as_list() )  # C1' of the second residue
-
-    if augc in ("A", "G"):
-        base3.append( r2.find_atom_by_name("N9").xyz.get_as_list() )
-        base3.append( r2.find_atom_by_name("C4").xyz.get_as_list() )
-
-    elif augc in ("C", "U"):
-        base3.append( r2.find_atom_by_name("N1").xyz.get_as_list() )
-        base3.append( r2.find_atom_by_name("C2").xyz.get_as_list() )
-
-    """ Get the translation-rotation matrix """
+    """ Prepare list of coordinates of all haevy atoms in base and C1' as xyzs """
+    """ and get the translation-rotation matrix by comparing xyzs and xyzs_[AUGC] """
     if augc == "A":
-        rmsd, rotmat = calcrotation(np.transpose(base3), np.transpose(base3_A))
+        xyzs = xyz_list( r2, ("N9", "C8", "N7", "C6", "N6", "C5", "C4", "N3", "C2", "N1", "C1%s" % SUGAR_MARK))
+        rmsd, rotmat = calcrotation(np.transpose(xyzs), np.transpose(xyzs_A))
     elif augc == "U":
-        rmsd, rotmat = calcrotation(np.transpose(base3), np.transpose(base3_U))
+        xyzs = xyz_list( r2, ("C6", "C5", "C4", "O4", "N3", "C2", "O2", "N1", "C1%s" % SUGAR_MARK))
+        rmsd, rotmat = calcrotation(np.transpose(xyzs), np.transpose(xyzs_U))
     elif augc == "G":
-        rmsd, rotmat = calcrotation(np.transpose(base3), np.transpose(base3_G))
+        xyzs = xyz_list( r2, ("N9", "C8", "N7", "C6", "O6", "C5", "C4", "N3", "C2", "N2", "N1", "C1%s" % SUGAR_MARK))
+        rmsd, rotmat = calcrotation(np.transpose(xyzs), np.transpose(xyzs_G))
     elif augc == "C":
-        rmsd, rotmat = calcrotation(np.transpose(base3), np.transpose(base3_C))
+        xyzs = xyz_list( r2, ("C6", "C5", "C4", "N4", "N3", "C2", "O2", "N1", "C1%s" % SUGAR_MARK))
+        rmsd, rotmat = calcrotation(np.transpose(xyzs), np.transpose(xyzs_C))
 
     mtx = mtx_crd_transform()
     mtx.mtx[:,:] = rotmat

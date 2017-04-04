@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 
+''' Selection of a database '''
 TARGET = 'RNA09'
 SUGAR_MARK = "'"
 LIBPDBAA = 'RNA09_FRAG_AA/'
@@ -12,14 +13,15 @@ from CalcROT import calcrotation
 import copy
 import numpy as np
 
-## Coordinates of C1', N9/N1, C4/C2 of nab/[augc].pdb
+
+""" Coordinates of C1', N9/N1, C4/C2 of nab/[augc].pdb """
 base3_A = [[7.514,4.080,7.390],[6.275,3.365,7.010],[5.089,3.947,6.630]]
 base3_G = [[7.514,4.080,7.390],[6.275,3.365,7.010],[5.082,3.956,6.630]]
 base3_U = [[7.514,4.080,7.390],[6.275,3.365,7.010],[5.189,4.127,6.660]]
 base3_C = [[7.514,4.080,7.390],[6.275,3.365,7.010],[5.166,4.124,6.660]]
 
 
-## Prepare standard base configurations from nab/[augc]_base.pdb
+""" Prepare standard base configurations from nab/[augc]_base.pdb """
 p = PdbFile('nab/a_base.pdb')
 p.open_to_read()
 chains = p.read_all()
@@ -45,7 +47,7 @@ p.close()
 res_base_C = copy.deepcopy( chains[0].residues[0] )
 
 
-def generate_atom(res, names, newname, chain_id, res_seq):
+def generate_atom(res, names, newname, chain_id, res_seq, element):
     a = False
     i = 0
     while not a:
@@ -58,6 +60,7 @@ def generate_atom(res, names, newname, chain_id, res_seq):
         a.name = newname
         a.chain_id = chain_id
         a.res_seq = res_seq
+        a.element = element
         return a
 
 
@@ -79,85 +82,85 @@ for l in open(LISTFILE):
 
     ################# Backbone of Residue 1 ####################
     r = Residue()
-    r.push_atom( generate_atom(r1, ("P",), " P  ", 1, 1) )
-    r.push_atom( generate_atom(r1, ("O1P", "OP1" ), " OP1", 1, 1) )
-    r.push_atom( generate_atom(r1, ("O2P", "OP2" ), " OP2", 1, 1) )
-    r.push_atom( generate_atom(r1, ("O5'", "O5*" ), " O5'", 1, 1) )
-    r.push_atom( generate_atom(r1, ("C5'", "C5*" ), " C5'", 1, 1) )
-    r.push_atom( generate_atom(r1, ("C4'", "C4*" ), " C4'", 1, 1) )
-    r.push_atom( generate_atom(r1, ("O4'", "O4*" ), " O4'", 1, 1) )
-    r.push_atom( generate_atom(r1, ("C3'", "C3*" ), " C3'", 1, 1) )
-    r.push_atom( generate_atom(r1, ("O3'", "O3*" ), " O3'", 1, 1) )
-    r.push_atom( generate_atom(r1, ("C2'", "C2*" ), " C2'", 1, 1) )
-    r.push_atom( generate_atom(r1, ("O2'", "O2*" ), " O2'", 1, 1) )
-    r.push_atom( generate_atom(r1, ("C1'", "C1*" ), " C1'", 1, 1) )
-    r.push_atom( generate_atom(r1, ("H5'", "H5*" ), "H5' ", 1, 1) )
-    r.push_atom( generate_atom(r1, ("H5''","H5**"), "H5''", 1, 1) )
-    r.push_atom( generate_atom(r1, ("H4'", "H4*" ), "H4' ", 1, 1) )
-    r.push_atom( generate_atom(r1, ("H3'", "H3*" ), "H3' ", 1, 1) )
-    r.push_atom( generate_atom(r1, ("H2'", "H2*" ), "H2' ", 1, 1) )
-    r.push_atom( generate_atom(r1, ("HO2'","HO2*"), "HO2'", 1, 1) )
-    r.push_atom( generate_atom(r1, ("H1'", "H1*" ), "H1' ", 1, 1) )
+    r.push_atom( generate_atom(r1, ("P",), " P  ", 1, 1, ' P') )
+    r.push_atom( generate_atom(r1, ("O1P", "OP1" ), " OP1", 1, 1, ' O') )
+    r.push_atom( generate_atom(r1, ("O2P", "OP2" ), " OP2", 1, 1, ' O') )
+    r.push_atom( generate_atom(r1, ("O5'", "O5*" ), " O5'", 1, 1, ' O') )
+    r.push_atom( generate_atom(r1, ("C5'", "C5*" ), " C5'", 1, 1, ' C') )
+    r.push_atom( generate_atom(r1, ("C4'", "C4*" ), " C4'", 1, 1, ' C') )
+    r.push_atom( generate_atom(r1, ("O4'", "O4*" ), " O4'", 1, 1, ' O') )
+    r.push_atom( generate_atom(r1, ("C3'", "C3*" ), " C3'", 1, 1, ' C') )
+    r.push_atom( generate_atom(r1, ("O3'", "O3*" ), " O3'", 1, 1, ' O') )
+    r.push_atom( generate_atom(r1, ("C2'", "C2*" ), " C2'", 1, 1, ' C') )
+    r.push_atom( generate_atom(r1, ("O2'", "O2*" ), " O2'", 1, 1, ' O') )
+    r.push_atom( generate_atom(r1, ("C1'", "C1*" ), " C1'", 1, 1, ' C') )
+    r.push_atom( generate_atom(r1, ("H5'", "H5*" ), "H5' ", 1, 1, ' H') )
+    r.push_atom( generate_atom(r1, ("H5''","H5**"), "H5''", 1, 1, ' H') )
+    r.push_atom( generate_atom(r1, ("H4'", "H4*" ), "H4' ", 1, 1, ' H') )
+    r.push_atom( generate_atom(r1, ("H3'", "H3*" ), "H3' ", 1, 1, ' H') )
+    r.push_atom( generate_atom(r1, ("H2'", "H2*" ), "H2' ", 1, 1, ' H') )
+    r.push_atom( generate_atom(r1, ("HO2'","HO2*"), "HO2'", 1, 1, ' H') )
+    r.push_atom( generate_atom(r1, ("H1'", "H1*" ), "H1' ", 1, 1, ' H') )
     c.push_residue(r)
 
     ################# Backbone of Residue 2 ####################
     r = Residue()
-    r.push_atom( generate_atom(r2, ("P",), " P  ", 1, 2) )
-    r.push_atom( generate_atom(r2, ("O1P", "OP1" ), " OP1", 1, 2) )
-    r.push_atom( generate_atom(r2, ("O2P", "OP2" ), " OP2", 1, 2) )
-    r.push_atom( generate_atom(r2, ("O5'", "O5*" ), " O5'", 1, 2) )
-    r.push_atom( generate_atom(r2, ("C5'", "C5*" ), " C5'", 1, 2) )
-    r.push_atom( generate_atom(r2, ("C4'", "C4*" ), " C4'", 1, 2) )
-    r.push_atom( generate_atom(r2, ("O4'", "O4*" ), " O4'", 1, 2) )
-    r.push_atom( generate_atom(r2, ("C3'", "C3*" ), " C3'", 1, 2) )
-    r.push_atom( generate_atom(r2, ("O3'", "O3*" ), " O3'", 1, 2) )
-    r.push_atom( generate_atom(r2, ("C2'", "C2*" ), " C2'", 1, 2) )
-    r.push_atom( generate_atom(r2, ("O2'", "O2*" ), " O2'", 1, 2) )
-    r.push_atom( generate_atom(r2, ("C1'", "C1*" ), " C1'", 1, 2) )
-    r.push_atom( generate_atom(r2, ("H5'", "H5*" ), "H5' ", 1, 2) )
-    r.push_atom( generate_atom(r2, ("H5''","H5**"), "H5''", 1, 2) )
-    r.push_atom( generate_atom(r2, ("H4'", "H4*" ), "H4' ", 1, 2) )
-    r.push_atom( generate_atom(r2, ("H3'", "H3*" ), "H3' ", 1, 2) )
-    r.push_atom( generate_atom(r2, ("H2'", "H2*" ), "H2' ", 1, 2) )
-    r.push_atom( generate_atom(r2, ("HO2'","HO2*"), "HO2'", 1, 2) )
-    r.push_atom( generate_atom(r2, ("H1'", "H1*" ), "H1' ", 1, 2) )
+    r.push_atom( generate_atom(r2, ("P",), " P  ", 1, 2, ' P') )
+    r.push_atom( generate_atom(r2, ("O1P", "OP1" ), " OP1", 1, 2, ' O') )
+    r.push_atom( generate_atom(r2, ("O2P", "OP2" ), " OP2", 1, 2, ' O') )
+    r.push_atom( generate_atom(r2, ("O5'", "O5*" ), " O5'", 1, 2, ' O') )
+    r.push_atom( generate_atom(r2, ("C5'", "C5*" ), " C5'", 1, 2, ' C') )
+    r.push_atom( generate_atom(r2, ("C4'", "C4*" ), " C4'", 1, 2, ' C') )
+    r.push_atom( generate_atom(r2, ("O4'", "O4*" ), " O4'", 1, 2, ' O') )
+    r.push_atom( generate_atom(r2, ("C3'", "C3*" ), " C3'", 1, 2, ' C') )
+    r.push_atom( generate_atom(r2, ("O3'", "O3*" ), " O3'", 1, 2, ' O') )
+    r.push_atom( generate_atom(r2, ("C2'", "C2*" ), " C2'", 1, 2, ' C') )
+    r.push_atom( generate_atom(r2, ("O2'", "O2*" ), " O2'", 1, 2, ' O') )
+    r.push_atom( generate_atom(r2, ("C1'", "C1*" ), " C1'", 1, 2, ' C') )
+    r.push_atom( generate_atom(r2, ("H5'", "H5*" ), "H5' ", 1, 2, ' H') )
+    r.push_atom( generate_atom(r2, ("H5''","H5**"), "H5''", 1, 2, ' H') )
+    r.push_atom( generate_atom(r2, ("H4'", "H4*" ), "H4' ", 1, 2, ' H') )
+    r.push_atom( generate_atom(r2, ("H3'", "H3*" ), "H3' ", 1, 2, ' H') )
+    r.push_atom( generate_atom(r2, ("H2'", "H2*" ), "H2' ", 1, 2, ' H') )
+    r.push_atom( generate_atom(r2, ("HO2'","HO2*"), "HO2'", 1, 2, ' H') )
+    r.push_atom( generate_atom(r2, ("H1'", "H1*" ), "H1' ", 1, 2, ' H') )
     c.push_residue(r)
 
     ################# Backbone of Residue 3 ####################
     r = Residue()
-    r.push_atom( generate_atom(r3, ("P",), " P  ", 1, 3) )
-    r.push_atom( generate_atom(r3, ("O1P", "OP1" ), " OP1", 1, 3) )
-    r.push_atom( generate_atom(r3, ("O2P", "OP2" ), " OP2", 1, 3) )
-    r.push_atom( generate_atom(r3, ("O5'", "O5*" ), " O5'", 1, 3) )
-    r.push_atom( generate_atom(r3, ("C5'", "C5*" ), " C5'", 1, 3) )
-    r.push_atom( generate_atom(r3, ("C4'", "C4*" ), " C4'", 1, 3) )
-    r.push_atom( generate_atom(r3, ("O4'", "O4*" ), " O4'", 1, 3) )
-    r.push_atom( generate_atom(r3, ("C3'", "C3*" ), " C3'", 1, 3) )
-    r.push_atom( generate_atom(r3, ("O3'", "O3*" ), " O3'", 1, 3) )
-    r.push_atom( generate_atom(r3, ("C2'", "C2*" ), " C2'", 1, 3) )
-    r.push_atom( generate_atom(r3, ("O2'", "O2*" ), " O2'", 1, 3) )
-    r.push_atom( generate_atom(r3, ("C1'", "C1*" ), " C1'", 1, 3) )
-    r.push_atom( generate_atom(r3, ("H5'", "H5*" ), "H5' ", 1, 3) )
-    r.push_atom( generate_atom(r3, ("H5''","H5**"), "H5''", 1, 3) )
-    r.push_atom( generate_atom(r3, ("H4'", "H4*" ), "H4' ", 1, 3) )
-    r.push_atom( generate_atom(r3, ("H3'", "H3*" ), "H3' ", 1, 3) )
-    r.push_atom( generate_atom(r3, ("H2'", "H2*" ), "H2' ", 1, 3) )
-    r.push_atom( generate_atom(r3, ("HO2'","HO2*"), "HO2'", 1, 3) )
-    r.push_atom( generate_atom(r3, ("H1'", "H1*" ), "H1' ", 1, 3) )
+    r.push_atom( generate_atom(r3, ("P",), " P  ", 1, 3, ' P') )
+    r.push_atom( generate_atom(r3, ("O1P", "OP1" ), " OP1", 1, 3, ' O') )
+    r.push_atom( generate_atom(r3, ("O2P", "OP2" ), " OP2", 1, 3, ' O') )
+    r.push_atom( generate_atom(r3, ("O5'", "O5*" ), " O5'", 1, 3, ' O') )
+    r.push_atom( generate_atom(r3, ("C5'", "C5*" ), " C5'", 1, 3, ' C') )
+    r.push_atom( generate_atom(r3, ("C4'", "C4*" ), " C4'", 1, 3, ' C') )
+    r.push_atom( generate_atom(r3, ("O4'", "O4*" ), " O4'", 1, 3, ' O') )
+    r.push_atom( generate_atom(r3, ("C3'", "C3*" ), " C3'", 1, 3, ' C') )
+    r.push_atom( generate_atom(r3, ("O3'", "O3*" ), " O3'", 1, 3, ' O') )
+    r.push_atom( generate_atom(r3, ("C2'", "C2*" ), " C2'", 1, 3, ' C') )
+    r.push_atom( generate_atom(r3, ("O2'", "O2*" ), " O2'", 1, 3, ' O') )
+    r.push_atom( generate_atom(r3, ("C1'", "C1*" ), " C1'", 1, 3, ' C') )
+    r.push_atom( generate_atom(r3, ("H5'", "H5*" ), "H5' ", 1, 3, ' H') )
+    r.push_atom( generate_atom(r3, ("H5''","H5**"), "H5''", 1, 3, ' H') )
+    r.push_atom( generate_atom(r3, ("H4'", "H4*" ), "H4' ", 1, 3, ' H') )
+    r.push_atom( generate_atom(r3, ("H3'", "H3*" ), "H3' ", 1, 3, ' H') )
+    r.push_atom( generate_atom(r3, ("H2'", "H2*" ), "H2' ", 1, 3, ' H') )
+    r.push_atom( generate_atom(r3, ("HO2'","HO2*"), "HO2'", 1, 3, ' H') )
+    r.push_atom( generate_atom(r3, ("H1'", "H1*" ), "H1' ", 1, 3, ' H') )
     c.push_residue(r)
 
 
     ################# Base of Residue 2 ####################
 
-    c_A = copy.deepcopy(c)
-    c_U = copy.deepcopy(c)
-    c_G = copy.deepcopy(c)
-    c_C = copy.deepcopy(c)
+    """##################"""
+    """# Super position #"""
+    """##################"""
 
+    """ Prepare the three atoms (C1', N9/N1, C4/C2) """
     base3 = []
-    # C1' of the second residue
-    base3.append( c.residues[1].atoms[-1].xyz.get_as_list() )
-    
+
+    base3.append( c.residues[1].atoms[-1].xyz.get_as_list() )  # C1' of the second residue
+
     if augc in ("A", "G"):
         base3.append( r2.find_atom_by_name("N9").xyz.get_as_list() )
         base3.append( r2.find_atom_by_name("C4").xyz.get_as_list() )
@@ -166,6 +169,7 @@ for l in open(LISTFILE):
         base3.append( r2.find_atom_by_name("N1").xyz.get_as_list() )
         base3.append( r2.find_atom_by_name("C2").xyz.get_as_list() )
 
+    """ Get the translation-rotation matrix """
     if augc == "A":
         rmsd, rotmat = calcrotation(np.transpose(base3), np.transpose(base3_A))
     elif augc == "U":
@@ -179,83 +183,42 @@ for l in open(LISTFILE):
     mtx.mtx[:,:] = rotmat
 
 
-    for a in res_base_A.atoms:
-        acopy = copy.deepcopy(a)
-        c_A.residues[1].push_atom( acopy )
-        c_A.residues[1].atoms[-1].xyz.put_as_list( mtx.do_to_array( acopy.xyz.get_as_list() ) )
+    """ Generate four types (AUGC) of fragment """
+    for char, res_target in (('A', res_base_A), 
+                             ('U', res_base_U),
+                             ('G', res_base_G),
+                             ('C', res_base_C),):
 
-    iserial = 0
-    chain_id = c_A.residues[0].atoms[0].chain_id
-    for r in c_A.residues:
-        for a in r.atoms:
-            iserial += 1
-            a.chain_id = chain_id
-            a.serial = iserial
+        c_out = copy.deepcopy(c)
 
-    c_A.reindex()
+        """ Apply the translation-rotation matrix """
+        for a in res_target.atoms:
+            acopy = copy.deepcopy(a)
+            c_out.residues[1].push_atom( acopy )
+            c_out.residues[1].atoms[-1].xyz.put_as_list( mtx.do_to_array( acopy.xyz.get_as_list() ) )
 
-    pdb = PdbFile('%s/%06i_A.pdb' % (LIBPDBAA, ifrag))
-    pdb.open_to_write()
-    pdb.write_all([c_A,])
-    pdb.close()
+        """ Re-index the serial ID and chain ID etc. """
+        iserial = 0
+        chain_id = c_out.residues[0].atoms[0].chain_id
+        for ir, r in enumerate(c_out.residues):
+            res_name = r.atoms[0].res_name
+            for a in r.atoms:
+                iserial += 1
+                a.chain_id = chain_id
+                a.serial = iserial
+                a.res_seq = ir + 1
+                a.res_name = res_name
+                a.ins_code = ''
+                a.alt_loc = ''
+    
+        c_out.reindex()
 
-    for a in res_base_U.atoms:
-        acopy = copy.deepcopy(a)
-        c_U.residues[1].push_atom( acopy )
-        c_U.residues[1].atoms[-1].xyz.put_as_list( mtx.do_to_array( acopy.xyz.get_as_list() ) )
 
-    iserial = 0
-    chain_id = c_U.residues[0].atoms[0].chain_id
-    for r in c_U.residues:
-        for a in r.atoms:
-            iserial += 1
-            a.chain_id = chain_id
-            a.serial = iserial
+        """########################"""
+        """# Output the fragments #"""
+        """########################"""
 
-    c_U.reindex()
-
-    pdb = PdbFile('%s/%06i_U.pdb' % (LIBPDBAA, ifrag))
-    pdb.open_to_write()
-    pdb.write_all([c_U,])
-    pdb.close()
-
-    for a in res_base_G.atoms:
-        acopy = copy.deepcopy(a)
-        c_G.residues[1].push_atom( acopy )
-        c_G.residues[1].atoms[-1].xyz.put_as_list( mtx.do_to_array( acopy.xyz.get_as_list() ) )
-
-    iserial = 0
-    chain_id = c_G.residues[0].atoms[0].chain_id
-    for r in c_G.residues:
-        for a in r.atoms:
-            iserial += 1
-            a.chain_id = chain_id
-            a.serial = iserial
-
-    c_G.reindex()
-
-    pdb = PdbFile('%s/%06i_G.pdb' % (LIBPDBAA, ifrag))
-    pdb.open_to_write()
-    pdb.write_all([c_G,])
-    pdb.close()
-
-    for a in res_base_C.atoms:
-        acopy = copy.deepcopy(a)
-        c_C.residues[1].push_atom( acopy )
-        c_C.residues[1].atoms[-1].xyz.put_as_list( mtx.do_to_array( acopy.xyz.get_as_list() ) )
-
-    iserial = 0
-    chain_id = c_C.residues[0].atoms[0].chain_id
-    for r in c_C.residues:
-        for a in r.atoms:
-            iserial += 1
-            a.chain_id = chain_id
-            a.serial = iserial
-
-    c_C.reindex()
-
-    pdb = PdbFile('%s/%06i_C.pdb' % (LIBPDBAA, ifrag))
-    pdb.open_to_write()
-    pdb.write_all([c_C,])
-    pdb.close()
-
+        pdb = PdbFile('%s/%06i_%s.pdb' % (LIBPDBAA, ifrag, char))
+        pdb.open_to_write()
+        pdb.write_all([c_out,])
+        pdb.close()

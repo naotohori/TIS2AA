@@ -1,0 +1,11 @@
+initial minimization whole system
+&cntrl
+  imin   = 1
+  ncyc = 200, maxcyc = 500
+  ntpr = 10, ntwx = 10,
+  ntb    = 0
+  cut    = 999.0
+  ntr = 1
+  restraint_wt = 50
+  restraintmask="@P"
+/

@@ -212,7 +212,10 @@ for l in open(LISTFILE):
                 a.chain_id = chain_id
                 a.serial = iserial
                 a.res_seq = ir + 1
-                a.res_name = res_name
+                if ir == 1:
+                    a.res_name = '  %s' % char
+                else:
+                    a.res_name = res_name
                 a.ins_code = ''
                 a.alt_loc = ''
     

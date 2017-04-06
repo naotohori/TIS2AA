@@ -64,6 +64,7 @@ if __name__ == "__main__":
         #lib_pucker.append( lsp[8] )
         lib_pseudo.append( (float(lsp[9]), float(lsp[10])) )
     
+    nlib = len(lib_pseudo)
     
     chains_aa = []
     for c_cg in chains_cg:
@@ -74,10 +75,10 @@ if __name__ == "__main__":
         xyzs_B = []
     
         """ Store sequence and coordinates of CG model """
-        for ir, r in enumerate(c_cg.residues):
+        for ir, r_cg in enumerate(c_cg.residues):
     
             flg_P = False; flg_S = False; flg_B = False;
-            for a in r.atoms:
+            for a in r_cg.atoms:
                 if a.name.strip() == 'P':
                     xyzs_P.append( a.xyz.get_as_list() )
                     flg_P = True
@@ -94,18 +95,57 @@ if __name__ == "__main__":
             if not flg_B:
                 print 'no B in cg model, ir=', ir
     
-            res_name = r.atoms[0].res_name.strip()[-1]
+            res_name = r_cg.atoms[0].res_name.strip()[-1]
             if res_name in ('A','U','G','C'):
                 seq.append( res_name )
             else:
-                print 'res_name is not valid:', r.atoms[0].res_name
+                print 'res_name is not valid:', r_cg.atoms[0].res_name
     
         nres = len(c_cg.residues)
         c_aa = Chain()
 
         
-        """ For the first residue """
-        #c_aa.push_residue( Residue() )
+        """ The first residue """
+        xyzSBPS_ref = np.array( [xyzs_S[0], xyzs_B[0], xyzs_P[1], xyzs_S[1]] )
+        best_rmsd = 9999.9
+        best_lib = 0
+        best_mtx = None
+        for ilib in range(nlib):
+            p = PdbFile('%s/%06i_%s.pdb' % (LIBPDBCG, ilib+1, seq[0]))
+            p.open_to_read()
+            c = p.read_all()[0]
+            xyzSBPS = [ c.residues[1].atoms[1].xyz.get_as_list(), # S2
+                        c.residues[1].atoms[2].xyz.get_as_list(), # B2
+                        c.residues[2].atoms[0].xyz.get_as_list(), # P3
+                        c.residues[2].atoms[1].xyz.get_as_list()] # S3
+            rmsd, mat = calcrotation(np.transpose(xyzSBPS_ref), np.transpose(xyzSBPS))
+            if rmsd < best_rmsd:
+                best_rmsd = rmsd
+                best_lib = ilib + 1
+                best_mtx = mat
+            p.close()
+            f_log.write("#%3i %06i %f\n" % (1, ilib+1, rmsd))
+
+        p = PdbFile('%s/%06i_%s.pdb' % (LIBPDBAA, best_lib, seq[0]))
+        p.open_to_read()
+        c = p.read_all()[0]
+        frag_res = c.residues[1]
+        p.close()
+     
+        mtx = mtx_crd_transform()
+        mtx.mtx[:,:] = best_mtx
+    
+        r_aa = Residue()
+        for a in frag_res.atoms:
+            if a.name.strip() in ("P","OP1","OP2","O1P", "O2P"):  # No P particle at the first nucleotide
+               continue
+            a_new = copy.deepcopy(a)
+            a_new.xyz.put_as_list( mtx.do_to_array( a.xyz.get_as_list() ) )
+            r_aa.push_atom( a_new )
+
+        c_aa.push_residue( r_aa )
+        f_log.write('%3i %6i  %6i %f\n' % (1, nlib, best_lib, best_rmsd))
+
     
         """ From the second to the second last residues """
         for ir in range(1, nres-1):
@@ -186,12 +226,12 @@ if __name__ == "__main__":
                         #rmsd, mat = calcrotation(np.transpose(xyzSPS_ref), np.transpose(xyzSPS))
                         best_mtx = mat
         
-                    f_log.write("#%3i %06i %f  %f %f\n" % (ir, lib, rmsd, angle[0], angle[1]))
+                    f_log.write("#%3i %06i %f  %f %f\n" % (ir+1, lib, rmsd, angle[0], angle[1]))
     
                 if best_rmsd <= RMSD_ACCEPT:
                     flg_found = True
     
-            f_log.write('%3i %6i %f  %f %f\n' % (ir, len(cand_lib), best_rmsd, best_angle[0], best_angle[1]))
+            f_log.write('%3i %6i  %6i %f  %f %f\n' % (ir+1, len(cand_lib), best_lib, best_rmsd, best_angle[0], best_angle[1]))
 
 
             p = PdbFile('%s/%06i_%s.pdb' % (LIBPDBAA, best_lib, seq[ir]))
@@ -229,16 +269,56 @@ if __name__ == "__main__":
 
             c_aa.push_residue( r_aa )
     
+
+        """ The last residue """
+        xyzSPSB_ref = np.array( [xyzs_S[-2], xyzs_P[-1], xyzs_S[-1], xyzs_B[-1]] )
+        best_rmsd = 9999.9
+        best_lib = 0
+        best_mtx = None
+        for ilib in range(nlib):
+            p = PdbFile('%s/%06i_%s.pdb' % (LIBPDBCG, ilib+1, seq[-1]))
+            p.open_to_read()
+            c = p.read_all()[0]
+            xyzSPSB = [ c.residues[0].atoms[1].xyz.get_as_list(), # S-2
+                        c.residues[1].atoms[0].xyz.get_as_list(), # P-1
+                        c.residues[1].atoms[1].xyz.get_as_list(), # S-1
+                        c.residues[1].atoms[2].xyz.get_as_list()] # B-1
+            rmsd, mat = calcrotation(np.transpose(xyzSPSB_ref), np.transpose(xyzSPSB))
+            if rmsd < best_rmsd:
+                best_rmsd = rmsd
+                best_lib = ilib + 1
+                best_mtx = mat
+            p.close()
+            f_log.write("#%3i %06i %f\n" % (nres, ilib+1, rmsd))
+
+        p = PdbFile('%s/%06i_%s.pdb' % (LIBPDBAA, best_lib, seq[-1]))
+        p.open_to_read()
+        c = p.read_all()[0]
+        frag_res = c.residues[1]
+        p.close()
+     
+        mtx = mtx_crd_transform()
+        mtx.mtx[:,:] = best_mtx
+    
+        r_aa = Residue()
+        for a in frag_res.atoms:
+            a_new = copy.deepcopy(a)
+            a_new.xyz.put_as_list( mtx.do_to_array( a.xyz.get_as_list() ) )
+            r_aa.push_atom( a_new )
+
+        c_aa.push_residue( r_aa )
+        f_log.write('%3i %6i  %6i %f\n' % (nres, nlib, best_lib, best_rmsd))
+ 
         chains_aa.append( c_aa )
     
     
     """ Re-numbering serial and residue IDs """
     serial = 0
     res_seq = 0
-    for c in chains_aa:
-        for r in c.residues:
+    for c_aa in chains_aa:
+        for r_aa in c_aa.residues:
             res_seq += 1
-            for a in r.atoms:
+            for a in r_aa.atoms:
                 serial += 1
                 a.serial = serial
                 a.res_seq = res_seq

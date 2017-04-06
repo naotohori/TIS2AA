@@ -28,7 +28,7 @@ def angle_diff(ang1, ang2):
     """ Calculate deviation of angles defined between 0 and 360 degree """
     d = abs(ang1 - ang2)
     if d > 180.0:
-        d = d - 180.0
+        d = 360.0 - d
     return d
 
 
@@ -123,7 +123,7 @@ if __name__ == "__main__":
 
 
             """ For superposition """
-            xyzSPS_ref = [ xyzS1, xyzP2, xyzS2 ]
+            #xyzSPS_ref  = [ xyzS1, xyzP2, xyzS2 ]
             xyzSPSB_ref = [ xyzS1, xyzP2, xyzS2, xyzB2 ]
             
     
@@ -150,7 +150,7 @@ if __name__ == "__main__":
                 for ilib, pseudo in enumerate(lib_pseudo):
                     d_eta   = angle_diff(eta,   pseudo[0])
                     d_theta = angle_diff(theta, pseudo[1])
-    
+
                     if d_eta <= limit and d_theta <= limit:
                         cand_lib.append(ilib+1)
                         cand_angle.append( (d_eta, d_theta) )

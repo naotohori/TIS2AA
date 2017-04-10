@@ -7,9 +7,9 @@ LIBPDBCG = 'RNA09_FRAG_CG/'  # output
 
 import glob
 import os
-from cafysis.file_io.pdb import PdbFile
-from cafysis.elements.pdb import Chain, Residue, Atom
-from cafysis.elements.coord import Coord
+from pdbfile import PdbFile
+from pdb import Chain, Residue, Atom
+from coord import Coord
 
 ATOMS_P = ('P','OP1','OP2')
 

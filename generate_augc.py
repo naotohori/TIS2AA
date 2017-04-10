@@ -6,9 +6,9 @@ SUGAR_MARK = "'"
 LIBPDBAA = 'RNA09_FRAG_AA/'
 LISTFILE = 'RNA09.nts'
 
-from cafysis.file_io.pdb import PdbFile
-from cafysis.elements.pdb import Chain, Residue
-from cafysis.mtx_coord_transform import mtx_crd_transform
+from pdbfile import PdbFile
+from pdb import Chain, Residue
+from mtx_coord_transform import mtx_crd_transform
 from CalcROT import calcrotation
 import copy
 import numpy as np

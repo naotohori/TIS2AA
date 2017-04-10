@@ -21,9 +21,9 @@ import math
 import numpy as np
 import glob
 import os
-from cafysis.file_io.pdb import PdbFile
-from cafysis.elements.pdb import Chain
-from cafysis.torsion import torsion
+from pdbfile import PdbFile
+from pdb import Chain
+from torsion import torsion
 
 
 def check_necessary_atoms_exist(res, res_name):

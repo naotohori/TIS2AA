@@ -8,16 +8,16 @@ LISTFILE = 'RNA09.nts'
 
 """ Parameters to search library """
 PSEUDO_LIMIT = 2.0   ## +/- 2.5  ===>  bins of 5 degree
-PSEUDO_MAX = 10.0
+PSEUDO_MAX = 20.0
 RMSD_ACCEPT = 1.0
 RMSD_MAX = 6.0
 flg_adjust_P_position = False
 
-from cafysis.elements.pdb import Chain, Residue, Atom
-from cafysis.elements.coord import Coord
-from cafysis.file_io.pdb import PdbFile
-from cafysis.torsion import torsion
-from cafysis.mtx_coord_transform import mtx_crd_transform
+from pdb import Chain, Residue, Atom
+from coord import Coord
+from pdbfile import PdbFile
+from torsion import torsion
+from mtx_coord_transform import mtx_crd_transform
 from CalcROT import calcrotation
 import sys
 import numpy as np

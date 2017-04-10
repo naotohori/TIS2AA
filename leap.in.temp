@@ -1,0 +1,4 @@
+source leaprc.RNA.OL3
+x = loadpdb ##NAME##.aa.pdb
+saveamberparm x ##NAME##.prmtop ##NAME##.inpcrd
+quit

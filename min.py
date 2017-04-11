@@ -10,15 +10,30 @@ if len(sys.argv) != 2:
 name = sys.argv[1]
 
 f_out = open('%s.leap.in' % name, 'w')
-for l in open('leap.in.temp'):
-    l.replace('##NAME##', name)
-    f_out.write(l)
+f_out.write('source leaprc.RNA.OL3\n')
+f_out.write('x = loadpdb %s.aa.pdb\n' % name)
+f_out.write('saveamberparm x %s.prmtop %s.inpcrd\n' % (name,name))
+f_out.write('quit\n')
+#for l in open('leap.in.temp'):
+#    f_out.write( l.replace('##NAME##', name) )
 f_out.close()
 
 #tleap -f leap.in
 subprocess.call( ['tleap','-f','%s.leap.in' % name] )
 
 #sander -O -i min.in -o mini.out -p prmtop -c inpcrd -ref inpcrd -r mini.rst
+f_out = open('min.in','w')
+f_out.write("initial minimization whole system\n")
+f_out.write("&cntrl\n")
+f_out.write("  imin   = 1\n")
+f_out.write("  ncyc = 200, maxcyc = 500\n")
+f_out.write("  ntb    = 0\n")
+f_out.write("  cut    = 999.0\n")
+f_out.write("  ntr = 1\n")
+f_out.write("  restraint_wt = 50\n")
+f_out.write('  restraintmask="@P"\n')
+f_out.write("/\n")
+f_out.close()
 subprocess.call( ['sander','-O', '-i','min.in', '-o', '%s.min.out' % name, '-p', '%s.prmtop' % name,
                   '-c', '%s.inpcrd' % name, '-ref', '%s.inpcrd' % name, '-r', '%s.rst' % name] )
 

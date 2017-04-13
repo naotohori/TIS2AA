@@ -1,10 +1,13 @@
 #!/usr/bin/env python
 
+import os 
 """ Selection of a database """
 SUGAR_MARK = "'"
-LIBPDBAA = 'RNA09_FRAG_AA/'  # input
-LIBPDBCG = 'RNA09_FRAG_CG/'  # output
-LISTFILE = 'RNA09.nts'
+BASEDIR = os.path.expanduser("~/TIS2AA/")
+BASEDIR = '%s/TIS2AA/' % os.environ['HOME']
+LIBPDBAA = BASEDIR + 'RNA09_FRAG_AA/'  # input
+LIBPDBCG = BASEDIR + 'RNA09_FRAG_CG/'  # output
+LISTFILE = BASEDIR + 'RNA09.nts'
 
 """ Parameters to search library """
 PSEUDO_LIMIT = 2.0   ## +/- 2.5  ===>  bins of 5 degree

@@ -1,7 +1,8 @@
 #!/usr/bin/env python
 
 MIN_NUM_ATOM_PER_NT = 22
-flg_PDB = True
+flg_PDB = True  # True: output PDB for each fragment
+                # False: only make a list
 
 TARGET = 'RNA09'
 PDBGLOB = 'RNA09/pdb/*.pdb'

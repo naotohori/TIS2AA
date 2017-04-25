@@ -1,4 +1,0 @@
-source leaprc.RNA.OL3
-x = loadpdb f024.aa.pdb
-saveamberparm x prmtop inpcrd
-quit

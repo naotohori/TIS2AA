@@ -9,7 +9,7 @@
 
 ````bash
  $ tis2aa.py  trna.cg.pdb  trna.log trna.aa.pdb
- $ min.py trna
+ $ min.py  trna.aa.pdb  trna.aa.min.pdb
 ````
 ----
 #### References

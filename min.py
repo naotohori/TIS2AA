@@ -96,7 +96,7 @@ if args.flg_noH:
                 continue
             else:
                 serial += 1
-                l = l[0:6] + '%5i'%serial + l[12:]
+                l = l[0:6] + '%5i'%serial + l[11:]
                 pdb.write(l)
 
     pdb.close()

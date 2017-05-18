@@ -122,10 +122,14 @@ if __name__ == "__main__":
                         c.residues[2].atoms[0].xyz.get_as_list(), # P3
                         c.residues[2].atoms[1].xyz.get_as_list()] # S3
             rmsd, mat = calcrotation(np.transpose(xyzSBPS_ref), np.transpose(xyzSBPS))
+
             if rmsd < best_rmsd:
                 best_rmsd = rmsd
                 best_lib = ilib + 1
                 best_mtx = mat
+                if rmsd <= RMSD_ACCEPT:
+                    break
+
             p.close()
             f_log.write("#%3i %06i %f\n" % (1, ilib+1, rmsd))
 
@@ -287,10 +291,14 @@ if __name__ == "__main__":
                         c.residues[1].atoms[1].xyz.get_as_list(), # S-1
                         c.residues[1].atoms[2].xyz.get_as_list()] # B-1
             rmsd, mat = calcrotation(np.transpose(xyzSPSB_ref), np.transpose(xyzSPSB))
+
             if rmsd < best_rmsd:
                 best_rmsd = rmsd
                 best_lib = ilib + 1
                 best_mtx = mat
+                if rmsd <= RMSD_ACCEPT:
+                    break
+
             p.close()
             f_log.write("#%3i %06i %f\n" % (nres, ilib+1, rmsd))
 

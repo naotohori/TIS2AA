@@ -2,6 +2,7 @@
 ''' Wrapper of tleap & sander '''
 __author__ = "Naoto Hori"
 
+import os
 import subprocess
 import argparse
 import shutil
@@ -32,6 +33,7 @@ file_minpdb = args.pdb_out
 
 file_min = args.prefix + '.in'
 file_out = args.prefix + '.out'
+file_mdinfo = args.prefix + '.mdinfo'
 file_leap = args.prefix + '.leap.in'
 file_prmtop = args.prefix + '.prmtop'
 file_inpcrd = args.prefix + '.inpcrd'
@@ -50,7 +52,8 @@ f_out.write('quit\n')
 f_out.close()
 
 #tleap -f leap.in
-subprocess.call( ['tleap','-f',file_leap] )
+FNULL = open(os.devnull, 'w')
+subprocess.call( ['tleap','-f',file_leap], stdout=FNULL )
 
 
 '''
@@ -69,7 +72,7 @@ f_out.write('  restraintmask="@P"\n')
 f_out.write("/\n")
 f_out.close()
 #sander -O -i min.in -o mini.out -p prmtop -c inpcrd -ref inpcrd -r mini.rst
-subprocess.call( ['sander','-O', '-i',file_min, '-o', file_out, '-p', file_prmtop,
+subprocess.call( ['sander','-O', '-i',file_min, '-o', file_out, '-inf', file_mdinfo, '-p', file_prmtop,
                   '-c', file_inpcrd, '-ref', file_inpcrd, '-r', file_rst] )
 
 

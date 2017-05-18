@@ -78,7 +78,7 @@ ambpdb
 '''
 #ambpdb -p prmtop -c mini.rst > VPK_0_34.aa.min.pdb
 f_minpdb = open(file_minpdb, 'w')
-subprocess.call( ['ambpdb', '-p', file_prmtop, '-c', file_rst, '-nobox'], stdout=f_minpdb )
+subprocess.call( ['ambpdb', '-p', file_prmtop, '-c', file_rst], stdout=f_minpdb )
 f_minpdb.close()
 
 

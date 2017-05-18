@@ -1,21 +1,9 @@
 #!/usr/bin/env python
+''' Conversion from TIS model to All-atomistic model'''
+__author__ = "Naoto Hori"
 
 import os 
-""" Selection of a database """
-SUGAR_MARK = "'"
-BASEDIR = os.path.expanduser("~/TIS2AA/")
-BASEDIR = '%s/TIS2AA/' % os.environ['HOME']
-LIBPDBAA = BASEDIR + 'RNA09_FRAG_AA/'  # input
-LIBPDBCG = BASEDIR + 'RNA09_FRAG_CG/'  # output
-LISTFILE = BASEDIR + 'RNA09.nts'
-
-""" Parameters to search library """
-PSEUDO_LIMIT = 2.0   ## +/- 2.5  ===>  bins of 5 degree
-PSEUDO_MAX = 20.0
-RMSD_ACCEPT = 1.0
-RMSD_MAX = 6.0
-flg_adjust_P_position = False
-
+import argparse
 from pdb import Chain, Residue, Atom
 from coord import Coord
 from pdbfile import PdbFile
@@ -26,7 +14,20 @@ import sys
 import numpy as np
 import copy
 
+################################################################################
+""" Selection of a database """
+SUGAR_MARK = "'"
+#BASEDIR = os.path.expanduser("~/TIS2AA/")
+BASEDIR = '%s/TIS2AA/' % os.environ['HOME']
 
+""" Parameters to search library """
+PSEUDO_BIN = 2.0   ## +/- 2.5  ===>  bins of 5 degree
+PSEUDO_MAX = 20.0
+RMSD_ACCEPT = 1.0
+RMSD_MAX = 6.0
+
+
+################################################################################
 def angle_diff(ang1, ang2):
     """ Calculate deviation of angles defined between 0 and 360 degree """
     d = abs(ang1 - ang2)
@@ -35,29 +36,60 @@ def angle_diff(ang1, ang2):
     return d
 
 
+################################################################################
 if __name__ == "__main__":
 
-    if not len(sys.argv) in (3,4):
-        print 'Usage: SCRIPT [input CG PDB] [output log file] [output AA PDB]'
-        print '  or : SCRIPT [input CG PDB] [output AA PDB]  (log file will be named tis2aa.log)'
-        sys.exit(2)
+    parser = argparse.ArgumentParser(
+             description='Structural conversion from TIS model to All-atomistic model',
+             formatter_class=argparse.ArgumentDefaultsHelpFormatter)
     
-    if len(sys.argv) == 4:
-        f_log = open(sys.argv[2],'w')
-    else:
-        f_log = open('tis2aa.log','w')
+    parser.add_argument('--binpseudo', dest='pseudo_bin', default=PSEUDO_BIN,
+                        action='store', type=float, 
+                        help='Half of bin size for pseudo angle') 
 
+    parser.add_argument('--maxpseudo', dest='pseudo_max', default=PSEUDO_MAX,
+                        action='store', type=float, 
+                        help='Maximum pseudo angle allowed to be deviate') 
+
+    parser.add_argument('--rmsd', dest='rmsd_accept', default=RMSD_ACCEPT,
+                        action='store', type=float, 
+                        help='RMSD to accept a fragment') 
+
+    parser.add_argument('--maxrmsd', dest='rmsd_max', default=RMSD_MAX,
+                        action='store', type=float, 
+                        help='Maximum rmsd for searching a fragment')
+
+    parser.add_argument('--Pexact', dest='flg_Pexact', default=False,
+                        action='store_true', 
+                        help='Align the position of P exactly')
+
+    parser.add_argument('--basedir', dest='basedir', default=BASEDIR,
+                        action='store', 
+                        help='Path for the directory where database exist')
+
+    parser.add_argument('--log', dest='logfilename', default='tis2aa.log',
+                        action='store', 
+                        help='Log filename')
+    
+    parser.add_argument('pdb_in',  help='Target CG PDB file')
+    parser.add_argument('pdb_out', help='Output AA PDB file')
+
+    args = parser.parse_args()
+
+    LIBPDBAA = args.basedir + 'RNA09_FRAG_AA/'  # input
+    LIBPDBCG = args.basedir + 'RNA09_FRAG_CG/'  # output
+    LISTFILE = args.basedir + 'RNA09.nts'
+    
+    ################################################################################
+    """ Open log file """
+    f_log = open(args.logfilename,'w')
 
     """ Read CG PDB """
-    p = PdbFile(sys.argv[1])
+    p = PdbFile(args.pdb_in)
     p.open_to_read()
     chains_cg = p.read_all()
     p.close()
     
-    """ Open AA PDB """
-    p = PdbFile(sys.argv[-1])
-    p.open_to_write()
-
     
     """ Read pseudo angles from library list (.nts) file """
     #lib_pucker = []
@@ -127,7 +159,7 @@ if __name__ == "__main__":
                 best_rmsd = rmsd
                 best_lib = ilib + 1
                 best_mtx = mat
-                if rmsd <= RMSD_ACCEPT:
+                if rmsd <= args.rmsd_accept:
                     break
 
             p.close()
@@ -181,10 +213,10 @@ if __name__ == "__main__":
     
                 """ Psuedo-angle range """
                 ilimit += 1
-                limit = PSEUDO_LIMIT * ilimit
+                limit = args.pseudo_bin * ilimit
     
-                if limit > PSEUDO_MAX:
-                    if best_rmsd <= RMSD_MAX:
+                if limit > args.pseudo_max:
+                    if best_rmsd <= args.rmsd_max:
                         break
                     else:
                         print 'limit > PSEUDO_MAX; could not find library for ir=',ir
@@ -235,7 +267,7 @@ if __name__ == "__main__":
         
                     f_log.write("#%3i %06i %f  %f %f\n" % (ir+1, lib, rmsd, angle[0], angle[1]))
     
-                if best_rmsd <= RMSD_ACCEPT:
+                if best_rmsd <= args.rmsd_accept:
                     flg_found = True
     
             f_log.write('%3i %6i  %6i %f  %f %f\n' % (ir+1, len(cand_lib), best_lib, best_rmsd, best_angle[0], best_angle[1]))
@@ -257,7 +289,7 @@ if __name__ == "__main__":
                 r_aa.push_atom( a_new )
             
             """ Adjust the position of P to be exactly identical """
-            if flg_adjust_P_position:
+            if args.flg_Pexact:
                 aaP = Coord()
                 nP = 0
                 for a in r_aa.atoms:
@@ -296,7 +328,7 @@ if __name__ == "__main__":
                 best_rmsd = rmsd
                 best_lib = ilib + 1
                 best_mtx = mat
-                if rmsd <= RMSD_ACCEPT:
+                if rmsd <= args.rmsd_accept:
                     break
 
             p.close()
@@ -339,7 +371,7 @@ if __name__ == "__main__":
     
 
     """ Write AA PDB """
-    p = PdbFile(sys.argv[-1])
+    p = PdbFile(args.pdb_out)
     p.open_to_write()
     p.write_all( chains_aa )
     p.close()

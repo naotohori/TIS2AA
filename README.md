@@ -1,3 +1,5 @@
+[![DOI](https://zenodo.org/badge/85434321.svg)](https://zenodo.org/badge/latestdoi/85434321)
+
 # TIS2AA
 ----
 

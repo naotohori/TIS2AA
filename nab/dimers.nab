@@ -1,0 +1,30 @@
+molecule m;
+m = fd_helix( "arna", "aa", "rna");
+putpdb( "aa_uu.pdb", m );
+
+m = fd_helix( "arna", "au", "rna");
+putpdb( "au_au.pdb", m );
+
+m = fd_helix( "arna", "ac", "rna");
+putpdb( "ac_gu.pdb", m );
+
+m = fd_helix( "arna", "ag", "rna");
+putpdb( "ag_cu.pdb", m );
+
+m = fd_helix( "arna", "gg", "rna");
+putpdb( "gg_cc.pdb", m );
+
+m = fd_helix( "arna", "ga", "rna");
+putpdb( "ga_uc.pdb", m );
+
+m = fd_helix( "arna", "gc", "rna");
+putpdb( "gc_gc.pdb", m );
+
+m = fd_helix( "arna", "ua", "rna");
+putpdb( "ua_ua.pdb", m );
+
+m = fd_helix( "arna", "ug", "rna");
+putpdb( "ug_ca.pdb", m );
+
+m = fd_helix( "arna", "cg", "rna");
+putpdb( "cg_cg.pdb", m );

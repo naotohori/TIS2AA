@@ -13,7 +13,8 @@ parser = argparse.ArgumentParser(description='Minimize given structure using san
 parser.add_argument('--noH', dest='flg_noH', default=False,
                     action='store_true', help='Remove hydrogen atoms from output')
 parser.add_argument('--rest', dest='restraint', default=50.0,
-                    action='store', type=float, help='[sander parameter] restraint_wt') 
+                    action='store', type=float, 
+                    help='[sander parameter] restraint_wt ; Put a negative value if no restraint desired.') 
 parser.add_argument('--maxcyc', dest='maxcyc', default=500,
                     action='store', type=int, help='[sander parameter] maxcyc') 
 parser.add_argument('--ncyc', dest='ncyc', default=200,
@@ -66,9 +67,10 @@ f_out.write("  imin   = 1\n")
 f_out.write("  ncyc = %i, maxcyc = %i\n" % (args.ncyc, args.maxcyc))
 f_out.write("  ntb    = 0\n")
 f_out.write("  cut    = 999.0\n")
-f_out.write("  ntr = 1\n")
-f_out.write("  restraint_wt = %f\n" % args.restraint)
-f_out.write('  restraintmask="@P"\n')
+if not args.restraint < 0.0:
+    f_out.write("  ntr = 1\n")
+    f_out.write("  restraint_wt = %f\n" % args.restraint)
+    f_out.write('  restraintmask="@P"\n')
 f_out.write("/\n")
 f_out.close()
 #sander -O -i min.in -o mini.out -p prmtop -c inpcrd -ref inpcrd -r mini.rst

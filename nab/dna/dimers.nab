@@ -1,0 +1,30 @@
+molecule m;
+m = fd_helix( "abdna", "aa", "dna");
+putpdb( "aa_tt.pdb", m );
+
+m = fd_helix( "abdna", "at", "dna");
+putpdb( "at_at.pdb", m );
+
+m = fd_helix( "abdna", "ac", "dna");
+putpdb( "ac_gt.pdb", m );
+
+m = fd_helix( "abdna", "ag", "dna");
+putpdb( "ag_ct.pdb", m );
+
+m = fd_helix( "abdna", "gg", "dna");
+putpdb( "gg_cc.pdb", m );
+
+m = fd_helix( "abdna", "ga", "dna");
+putpdb( "ga_tc.pdb", m );
+
+m = fd_helix( "abdna", "gc", "dna");
+putpdb( "gc_gc.pdb", m );
+
+m = fd_helix( "abdna", "ta", "dna");
+putpdb( "ta_ta.pdb", m );
+
+m = fd_helix( "abdna", "tg", "dna");
+putpdb( "tg_ca.pdb", m );
+
+m = fd_helix( "abdna", "cg", "dna");
+putpdb( "cg_cg.pdb", m );

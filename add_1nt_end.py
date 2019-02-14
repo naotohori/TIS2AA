@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 
+DIR_NAB = "/home/hori/TIS2AA/nab"
 SUGAR_MARK = "'"
 from pdbfile import PdbFile
 from pdb import Chain, Residue
@@ -65,7 +66,7 @@ else: # end == 3
 
 
 """ Prepare standard dimer configurations from nab """
-p = PdbFile('nab/%s.pdb' % dimer_seq)
+p = PdbFile('%s/%s.pdb' % (DIR_NAB, dimer_seq))
 p.open_to_read()
 dimer = p.read_all()[0]
 p.close()

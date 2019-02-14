@@ -127,14 +127,17 @@ if __name__ == "__main__":
                 xyzs_P.append( False )
             if not flg_S:
                 print 'no S in cg model, ir=', ir
+                f_log.write('no S in cg model, ir=%i' % ir)
             if not flg_B:
                 print 'no B in cg model, ir=', ir
+                f_log.write('no B in cg model, ir=%i' % ir)
     
             res_name = r_cg.atoms[0].res_name.strip()[-1]
             if res_name in ('A','U','G','C'):
                 seq.append( res_name )
             else:
                 print 'res_name is not valid:', r_cg.atoms[0].res_name
+                f_log.write('Warning: res_name is not valid: %s' % r_cg.atoms[0].res_name)
     
         nres = len(c_cg.residues)
         c_aa = Chain()
@@ -220,6 +223,7 @@ if __name__ == "__main__":
                         break
                     else:
                         print 'limit > PSEUDO_MAX; could not find library for ir=',ir
+                        f_log.write('Error: limit > PSEUDO_MAX; could not find library for ir=%i' % ir)
                         sys.exit(2)
     
 
@@ -298,6 +302,7 @@ if __name__ == "__main__":
                         nP += 1
                 if nP != 3:
                     print 'Error: nP != 3, ir=,',ir
+                    f_log.write('Error: nP != 3, ir=%i' % ir)
                     sys.exit(2)
                 aaP = aaP / float(3)
                 trans = xyzP2 - aaP.get_as_ndarray()

@@ -13,7 +13,7 @@ import sys
 
 ''' INPUT '''
 if len(sys.argv) != 5:
-    print 'Usage: SCRIPT [PDB file] [5 or 3] [nucleotide type (a,u,g,c)] [output PDB]'
+    print ('Usage: SCRIPT [PDB file] [5 or 3] [nucleotide type (a,u,g,c)] [output PDB]')
     sys.exit(2)
 
 filename_pdb = sys.argv[1]
@@ -23,10 +23,10 @@ filename_out = sys.argv[4]
 
 ''' Check arguments '''
 if end not in (5,3):
-    print 'Error: the second argument has to be either 5 or 3'
+    print ('Error: the second argument has to be either 5 or 3')
     sys.exit(2)
 if nuc not in ('a','u','g','c'):
-    print 'Error: the last argument has to be either one of augc'
+    print ('Error: the last argument has to be either one of augc')
     sys.exit(2)
 
 
@@ -37,7 +37,7 @@ chains = p.read_all()
 p.close()
 
 if len(chains) > 1:
-    print 'Error: currently available only for single chain PDB'
+    print ('Error: currently available only for single chain PDB')
     sys.exit(2)
     # To do: add multiple chain case. Maybe specify chain ID as an argument
 
@@ -50,8 +50,8 @@ if end == 5:
             a.res_name = '   %s' % nuc_end.upper()
     dimer_seq = '%s%s' % (nuc, nuc_end)
 
-    print 'The first nucleotide of the PDB is ', nuc_end.upper(), '.'
-    print 'Now ', nuc.upper(),' is being added by using a dimer', dimer_seq.upper(),'.'
+    print ('The first nucleotide of the PDB is ', nuc_end.upper(), '.')
+    print ('Now ', nuc.upper(),' is being added by using a dimer', dimer_seq.upper(),'.')
 
 else: # end == 3
     nuc_end = chains[0].residues[-1].atoms[0].res_name.lower().strip()
@@ -61,8 +61,8 @@ else: # end == 3
             a.res_name = '   %s' % nuc_end.upper()
     dimer_seq = '%s%s' % (nuc_end, nuc)
 
-    print 'The last nucleotide of the PDB is ', nuc_end.upper(), '.'
-    print 'Now ', nuc.upper(),' is being added by using a dimer', dimer_seq.upper(),'.'
+    print ('The last nucleotide of the PDB is ', nuc_end.upper(), '.')
+    print ('Now ', nuc.upper(),' is being added by using a dimer', dimer_seq.upper(),'.')
 
 
 """ Prepare standard dimer configurations from nab """
@@ -121,7 +121,7 @@ elif nuc_end == 'c':
 
 """ Superposition """
 rmsd, rotmat = calcrotation(np.transpose(xyz_target), np.transpose(xyz_dimer))
-print 'rmsd=',rmsd
+print ('rmsd=', rmsd)
 mtx = mtx_crd_transform()
 mtx.mtx[:,:] = rotmat
 

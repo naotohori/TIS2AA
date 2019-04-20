@@ -51,7 +51,7 @@ def torsion_xy(p1, p2, p3, p4):
 
 
 if __name__ == "__main__":
-    print 'Test of torsion.py'
+    print ('Test of torsion.py')
     print ('''
     ATOM  22440  C4'   G A   0      24.717  92.775  96.702  1.00 31.19           C
     ATOM  22458  P     A A   1      22.332  94.740  95.607  1.00 34.55           P
@@ -66,13 +66,13 @@ if __name__ == "__main__":
     d = np.array([ 18.954 , 96.788 , 90.471])
     e = np.array([ 19.175 , 99.605 , 87.735])
 
-    print "Torsion of C4'-P-C4'-P"
-    print '  flg_360=False(default): %f rad, %f deg' % (torsion(a,b,c,d), torsion(a,b,c,d,True))
-    print '  flg_360=True          : %f rad, %f deg' % (torsion(a,b,c,d,flg_360=True), torsion(a,b,c,d,True,flg_360=True))
-    print '  cos(phi), sin(phi)    : x = %f, y = %f' % torsion_xy(a,b,c,d)
+    print ("Torsion of C4'-P-C4'-P")
+    print ('  flg_360=False(default): %f rad, %f deg' % (torsion(a,b,c,d), torsion(a,b,c,d,True)))
+    print ('  flg_360=True          : %f rad, %f deg' % (torsion(a,b,c,d,flg_360=True), torsion(a,b,c,d,True,flg_360=True)))
+    print ('  cos(phi), sin(phi)    : x = %f, y = %f' % torsion_xy(a,b,c,d))
 
-    print "Torsion of P-C4'-P-C4'"
-    print '  flg_360=False(default): %f rad, %f deg' % (torsion(b,c,d,e), torsion(b,c,d,e,True))
-    print '  flg_360=True          : %f rad, %f deg' % (torsion(b,c,d,e,flg_360=True), torsion(b,c,d,e,True,flg_360=True))
-    print '  cos(phi), sin(phi)    : x = %f, y = %f' % torsion_xy(b,c,d,e)
+    print ("Torsion of P-C4'-P-C4'")
+    print ('  flg_360=False(default): %f rad, %f deg' % (torsion(b,c,d,e), torsion(b,c,d,e,True)))
+    print ('  flg_360=True          : %f rad, %f deg' % (torsion(b,c,d,e,flg_360=True), torsion(b,c,d,e,True,flg_360=True)))
+    print ('  cos(phi), sin(phi)    : x = %f, y = %f' % torsion_xy(b,c,d,e))
 

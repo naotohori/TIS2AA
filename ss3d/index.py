@@ -1,0 +1,10 @@
+
+RNAP = 0
+RNAS = 1
+RNAB = 2
+
+BASEA = 0
+BASEU = 1
+BASEG = 2
+BASEC = 3
+

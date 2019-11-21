@@ -21,6 +21,8 @@ parser.add_argument('--ncyc', dest='ncyc', default=200,
                     action='store', type=int, help='[sander parameter] ncyc') 
 parser.add_argument('--prefix', dest='prefix', default='min',
                     action='store', help='prefix for sander output files')
+parser.add_argument('--circ', dest='circ', default=False,
+                    action='store_true', help='circular RNA/DNA')
 
 parser.add_argument('pdb_in',  help='target PDB file')
 parser.add_argument('pdb_out', help='output minimized PDB file')
@@ -32,6 +34,11 @@ args = parser.parse_args()
 file_pdb = args.pdb_in
 file_minpdb = args.pdb_out
 
+if args.circ:
+    file_leap_src = 'leaprc.circRNA.OL3'
+else:
+    file_leap_src = 'leaprc.RNA.OL3'
+
 file_min = args.prefix + '.in'
 file_out = args.prefix + '.out'
 file_mdinfo = args.prefix + '.mdinfo'
@@ -41,13 +48,23 @@ file_inpcrd = args.prefix + '.inpcrd'
 file_rst = args.prefix + '.rst'
 
 ################################################################################
-
 '''
 Leap
 '''
+""" Get the first and last residue ID if circ """
+if args.circ:
+    ir_ini = 1
+    ll = ''
+    for l in open(file_pdb,'r'):
+        if l[0:6] == 'ATOM  ':
+            ll = l
+    ir_end = int(ll[22:26])
+
 f_out = open(file_leap, 'w')
-f_out.write('source leaprc.RNA.OL3\n')
+f_out.write('source %s\n' % file_leap_src)
 f_out.write('x = loadpdb %s\n' % file_pdb)
+if args.circ:
+    f_out.write("bond x.%i.O3' x.%i.P\n" % (ir_end, ir_ini))
 f_out.write('saveamberparm x %s %s\n' % (file_prmtop, file_inpcrd))
 f_out.write('quit\n')
 f_out.close()

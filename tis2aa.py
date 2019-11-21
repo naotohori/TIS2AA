@@ -71,6 +71,10 @@ if __name__ == "__main__":
                         action='store', 
                         help='Log filename')
     
+    parser.add_argument('--circ', dest='circ', default=False,
+                        action='store_true', 
+                        help='circular RNA/DNA')
+    
     parser.add_argument('pdb_in',  help='Target CG PDB file')
     parser.add_argument('pdb_out', help='Output AA PDB file')
 
@@ -144,61 +148,76 @@ if __name__ == "__main__":
 
         
         """ The first residue """
-        xyzSBPS_ref = np.array( [xyzs_S[0], xyzs_B[0], xyzs_P[1], xyzs_S[1]] )
-        best_rmsd = 9999.9
-        best_lib = 0
-        best_mtx = None
-        for ilib in range(nlib):
-            p = PdbFile('%s/%06i_%s.pdb' % (LIBPDBCG, ilib+1, seq[0]))
+        if not args.circ:
+            xyzSBPS_ref = np.array( [xyzs_S[0], xyzs_B[0], xyzs_P[1], xyzs_S[1]] )
+            best_rmsd = 9999.9
+            best_lib = 0
+            best_mtx = None
+            for ilib in range(nlib):
+                p = PdbFile('%s/%06i_%s.pdb' % (LIBPDBCG, ilib+1, seq[0]))
+                p.open_to_read()
+                c = p.read_all()[0]
+                xyzSBPS = [ c.residues[1].atoms[1].xyz.get_as_list(), # S2
+                            c.residues[1].atoms[2].xyz.get_as_list(), # B2
+                            c.residues[2].atoms[0].xyz.get_as_list(), # P3
+                            c.residues[2].atoms[1].xyz.get_as_list()] # S3
+                rmsd, mat = calcrotation(np.transpose(xyzSBPS_ref), np.transpose(xyzSBPS))
+    
+                if rmsd < best_rmsd:
+                    best_rmsd = rmsd
+                    best_lib = ilib + 1
+                    best_mtx = mat
+                    if rmsd <= args.rmsd_accept:
+                        break
+    
+                p.close()
+                f_log.write("#%3i %06i %f\n" % (1, ilib+1, rmsd))
+    
+            p = PdbFile('%s/%06i_%s.pdb' % (LIBPDBAA, best_lib, seq[0]))
             p.open_to_read()
             c = p.read_all()[0]
-            xyzSBPS = [ c.residues[1].atoms[1].xyz.get_as_list(), # S2
-                        c.residues[1].atoms[2].xyz.get_as_list(), # B2
-                        c.residues[2].atoms[0].xyz.get_as_list(), # P3
-                        c.residues[2].atoms[1].xyz.get_as_list()] # S3
-            rmsd, mat = calcrotation(np.transpose(xyzSBPS_ref), np.transpose(xyzSBPS))
-
-            if rmsd < best_rmsd:
-                best_rmsd = rmsd
-                best_lib = ilib + 1
-                best_mtx = mat
-                if rmsd <= args.rmsd_accept:
-                    break
-
+            frag_res = c.residues[1]
             p.close()
-            f_log.write("#%3i %06i %f\n" % (1, ilib+1, rmsd))
-
-        p = PdbFile('%s/%06i_%s.pdb' % (LIBPDBAA, best_lib, seq[0]))
-        p.open_to_read()
-        c = p.read_all()[0]
-        frag_res = c.residues[1]
-        p.close()
-     
-        mtx = mtx_crd_transform()
-        mtx.mtx[:,:] = best_mtx
+         
+            mtx = mtx_crd_transform()
+            mtx.mtx[:,:] = best_mtx
+        
+            r_aa = Residue()
+            for a in frag_res.atoms:
+                if a.name.strip() in ("P","OP1","OP2","O1P", "O2P"):  # No P particle at the first nucleotide
+                   continue
+                a_new = copy.deepcopy(a)
+                a_new.xyz.put_as_list( mtx.do_to_array( a.xyz.get_as_list() ) )
+                r_aa.push_atom( a_new )
     
-        r_aa = Residue()
-        for a in frag_res.atoms:
-            if a.name.strip() in ("P","OP1","OP2","O1P", "O2P"):  # No P particle at the first nucleotide
-               continue
-            a_new = copy.deepcopy(a)
-            a_new.xyz.put_as_list( mtx.do_to_array( a.xyz.get_as_list() ) )
-            r_aa.push_atom( a_new )
-
-        c_aa.push_residue( r_aa )
-        f_log.write('%3i %6i  %6i %f\n' % (1, nlib, best_lib, best_rmsd))
+            c_aa.push_residue( r_aa )
+            f_log.write('%3i %6i  %6i %f\n' % (1, nlib, best_lib, best_rmsd))
 
     
         """ From the second to the second last residues """
-        for ir in range(1, nres-1):
+        if args.circ:
+            ir_start = 0
+            ir_end = nres-1
+        else:
+            ir_start = 1
+            ir_end = nres-2
+
+        for ir in range(ir_start, ir_end+1):
     
+            ir0 = ir - 1
+            if ir0 < 0:
+                ir0 += nres
+            ir2 = ir + 1
+            if ir2 > nres-1:
+                ir2 -= nres
+
             """ Calcualte pseudo angles """
-            xyzS1 = np.array( xyzs_S[ir-1] )
+            xyzS1 = np.array( xyzs_S[ir0] )
             xyzP2 = np.array( xyzs_P[ir] )
             xyzS2 = np.array( xyzs_S[ir] )
             xyzB2 = np.array( xyzs_B[ir] )
-            xyzP3 = np.array( xyzs_P[ir+1] )
-            xyzS3 = np.array( xyzs_S[ir+1] )
+            xyzP3 = np.array( xyzs_P[ir2] )
+            xyzS3 = np.array( xyzs_S[ir2] )
     
             eta    = torsion(xyzS1, xyzP2, xyzS2, xyzP3, flg_degree=True, flg_360=True)
             theta  = torsion(xyzP2, xyzS2, xyzP3, xyzS3, flg_degree=True, flg_360=True)
@@ -315,48 +334,50 @@ if __name__ == "__main__":
     
 
         """ The last residue """
-        xyzSPSB_ref = np.array( [xyzs_S[-2], xyzs_P[-1], xyzs_S[-1], xyzs_B[-1]] )
-        best_rmsd = 9999.9
-        best_lib = 0
-        best_mtx = None
-        for ilib in range(nlib):
-            p = PdbFile('%s/%06i_%s.pdb' % (LIBPDBCG, ilib+1, seq[-1]))
+        if not args.circ:
+            xyzSPSB_ref = np.array( [xyzs_S[-2], xyzs_P[-1], xyzs_S[-1], xyzs_B[-1]] )
+            best_rmsd = 9999.9
+            best_lib = 0
+            best_mtx = None
+            for ilib in range(nlib):
+                p = PdbFile('%s/%06i_%s.pdb' % (LIBPDBCG, ilib+1, seq[-1]))
+                p.open_to_read()
+                c = p.read_all()[0]
+                xyzSPSB = [ c.residues[0].atoms[1].xyz.get_as_list(), # S-2
+                            c.residues[1].atoms[0].xyz.get_as_list(), # P-1
+                            c.residues[1].atoms[1].xyz.get_as_list(), # S-1
+                            c.residues[1].atoms[2].xyz.get_as_list()] # B-1
+                rmsd, mat = calcrotation(np.transpose(xyzSPSB_ref), np.transpose(xyzSPSB))
+    
+                if rmsd < best_rmsd:
+                    best_rmsd = rmsd
+                    best_lib = ilib + 1
+                    best_mtx = mat
+                    if rmsd <= args.rmsd_accept:
+                        break
+    
+                p.close()
+                f_log.write("#%3i %06i %f\n" % (nres, ilib+1, rmsd))
+    
+            p = PdbFile('%s/%06i_%s.pdb' % (LIBPDBAA, best_lib, seq[-1]))
             p.open_to_read()
             c = p.read_all()[0]
-            xyzSPSB = [ c.residues[0].atoms[1].xyz.get_as_list(), # S-2
-                        c.residues[1].atoms[0].xyz.get_as_list(), # P-1
-                        c.residues[1].atoms[1].xyz.get_as_list(), # S-1
-                        c.residues[1].atoms[2].xyz.get_as_list()] # B-1
-            rmsd, mat = calcrotation(np.transpose(xyzSPSB_ref), np.transpose(xyzSPSB))
-
-            if rmsd < best_rmsd:
-                best_rmsd = rmsd
-                best_lib = ilib + 1
-                best_mtx = mat
-                if rmsd <= args.rmsd_accept:
-                    break
-
+            frag_res = c.residues[1]
             p.close()
-            f_log.write("#%3i %06i %f\n" % (nres, ilib+1, rmsd))
-
-        p = PdbFile('%s/%06i_%s.pdb' % (LIBPDBAA, best_lib, seq[-1]))
-        p.open_to_read()
-        c = p.read_all()[0]
-        frag_res = c.residues[1]
-        p.close()
-     
-        mtx = mtx_crd_transform()
-        mtx.mtx[:,:] = best_mtx
+         
+            mtx = mtx_crd_transform()
+            mtx.mtx[:,:] = best_mtx
+        
+            r_aa = Residue()
+            for a in frag_res.atoms:
+                a_new = copy.deepcopy(a)
+                a_new.xyz.put_as_list( mtx.do_to_array( a.xyz.get_as_list() ) )
+                r_aa.push_atom( a_new )
     
-        r_aa = Residue()
-        for a in frag_res.atoms:
-            a_new = copy.deepcopy(a)
-            a_new.xyz.put_as_list( mtx.do_to_array( a.xyz.get_as_list() ) )
-            r_aa.push_atom( a_new )
-
-        c_aa.push_residue( r_aa )
-        f_log.write('%3i %6i  %6i %f\n' % (nres, nlib, best_lib, best_rmsd))
- 
+            c_aa.push_residue( r_aa )
+            f_log.write('%3i %6i  %6i %f\n' % (nres, nlib, best_lib, best_rmsd))
+     
+        """ Add the chain """
         chains_aa.append( c_aa )
     
     

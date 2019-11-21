@@ -19,14 +19,14 @@ class PdbFile(object) :
         
     def open_to_read(self):
         if self._status != 'Closed' :
-            print 'Error: file is not closed, in open_for_read in PdbFile'
+            print ('Error: file is not closed, in open_for_read in PdbFile')
             sys.exit(2)
             #raise MyError('PdbFile', 'open_for_read', 'file is not closed')
         self._file = open(self._filename, 'r')
         
     def open_to_write(self):
         if self._status != 'Closed' :
-            print 'Error: file is not closed, in open_for_write in PdbFile'
+            print ('Error: file is not closed, in open_for_write in PdbFile')
             sys.exit(2)
             #raise MyError('PdbFile', 'open_for_read', 'file is not closed')
         self._file = open(self._filename, 'w')
@@ -105,7 +105,7 @@ class PdbFile(object) :
     def _line2atom(self, line):
         line = line.rstrip()
         if line[0:6] != 'ATOM  ' and line[0:6] != 'HETATM' :
-            print 'Error: line does not begin with "ATOM" in deompose_atom in PdbFile'
+            print ('Error: line does not begin with "ATOM" in deompose_atom in PdbFile')
             sys.exit(2)
             #raise MyError('PdbFile', 'decompose_atom', 'line does not begin with "ATOM"')
         

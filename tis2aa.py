@@ -130,17 +130,17 @@ if __name__ == "__main__":
             if not flg_P:
                 xyzs_P.append( False )
             if not flg_S:
-                print 'no S in cg model, ir=', ir
+                print ('no S in cg model, ir=', ir)
                 f_log.write('no S in cg model, ir=%i' % ir)
             if not flg_B:
-                print 'no B in cg model, ir=', ir
+                print ('no B in cg model, ir=', ir)
                 f_log.write('no B in cg model, ir=%i' % ir)
     
             res_name = r_cg.atoms[0].res_name.strip()[-1]
             if res_name in ('A','U','G','C'):
                 seq.append( res_name )
             else:
-                print 'res_name is not valid:', r_cg.atoms[0].res_name
+                print ('res_name is not valid:', r_cg.atoms[0].res_name)
                 f_log.write('Warning: res_name is not valid: %s' % r_cg.atoms[0].res_name)
     
         nres = len(c_cg.residues)
@@ -241,7 +241,7 @@ if __name__ == "__main__":
                     if best_rmsd <= args.rmsd_max:
                         break
                     else:
-                        print 'limit > PSEUDO_MAX; could not find library for ir=',ir
+                        print ('limit > PSEUDO_MAX; could not find library for ir=', ir)
                         f_log.write('Error: limit > PSEUDO_MAX; could not find library for ir=%i' % ir)
                         sys.exit(2)
     
@@ -320,7 +320,7 @@ if __name__ == "__main__":
                         aaP = aaP + a.xyz
                         nP += 1
                 if nP != 3:
-                    print 'Error: nP != 3, ir=,',ir
+                    print ('Error: nP != 3, ir=,', ir)
                     f_log.write('Error: nP != 3, ir=%i' % ir)
                     sys.exit(2)
                 aaP = aaP / float(3)

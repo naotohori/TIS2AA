@@ -1,21 +1,22 @@
 #!/usr/bin/env python
 
+from coord import Coord
+from pdb import Chain, Residue, Atom
+from pdbfile import PdbFile
+import os
+import glob
+
 ''' Selection of a database '''
 SUGAR_MARK = "'"
 LIBPDBAA = 'RNA09_FRAG_AA/'  # input
 LIBPDBCG = 'RNA09_FRAG_CG/'  # output
 
-import glob
-import os
-from pdbfile import PdbFile
-from pdb import Chain, Residue, Atom
-from coord import Coord
 
-ATOMS_P = ('P','OP1','OP2')
+ATOMS_P = ('P', 'OP1', 'OP2')
 
 for path in glob.glob('%s/*_?.pdb' % LIBPDBAA):
 
-    pdb_in = PdbFile( path )
+    pdb_in = PdbFile(path)
     pdb_in.open_to_read()
     c = pdb_in.read_all()[0]
     pdb_in.close()
@@ -46,7 +47,7 @@ for path in glob.glob('%s/*_?.pdb' % LIBPDBAA):
                 xyz_B += a.xyz
                 nB += 1
             nt = a.res_name.strip()
-    
+
         res_id += 1
         r_cg = Residue()
 
@@ -87,6 +88,5 @@ for path in glob.glob('%s/*_?.pdb' % LIBPDBAA):
 
     pdb_out = PdbFile(LIBPDBCG + os.path.basename(path))
     pdb_out.open_to_write()
-    pdb_out.write_all( [c_out,] )
+    pdb_out.write_all([c_out, ])
     pdb_out.close()
-

@@ -4,7 +4,7 @@ __author__ = "Naoto Hori"
 
 import os
 import argparse
-from pdb import Chain, Residue, Atom
+from pdb_elements import Chain, Residue, Atom
 from coord import Coord
 from pdbfile import PdbFile
 from torsion import torsion

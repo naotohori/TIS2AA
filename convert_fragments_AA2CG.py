@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 from coord import Coord
-from pdb import Chain, Residue, Atom
+from pdb_elements import Chain, Residue, Atom
 from pdbfile import PdbFile
 import os
 import glob

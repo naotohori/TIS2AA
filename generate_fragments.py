@@ -5,7 +5,7 @@ import numpy as np
 import glob
 import os
 from pdbfile import PdbFile
-from pdb import Chain
+from pdb_elements import Chain
 from torsion import torsion
 
 MIN_NUM_ATOM_PER_NT = 22

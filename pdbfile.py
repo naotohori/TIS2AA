@@ -5,7 +5,7 @@
 '''
 
 from coord import Coord
-from pdb import Atom, Chain, Residue
+from pdb_elements import Atom, Chain, Residue
 
 import sys
 

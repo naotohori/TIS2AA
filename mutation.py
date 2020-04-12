@@ -7,7 +7,7 @@ LIBPDBAA = 'RNA09_FRAG_AA/'
 LISTFILE = 'RNA09.nts'
 
 from pdbfile import PdbFile
-from pdb import Chain, Residue
+from pdb_elements import Chain, Residue
 from mtx_coord_transform import mtx_crd_transform
 from CalcROT import calcrotation
 import copy

@@ -17,7 +17,7 @@ class mtx_crd_transform():
         
     def show(self):
         for i in range(4):
-            print (tuple(self.mtx[i]))
+            print(tuple(self.mtx[i]))
             
     def do_to_array(self, d):
         '''配列d[x,y,z]を受け取って、mtxを施して返す。
@@ -116,14 +116,14 @@ if __name__ == "__main__" :
     import sys
     
     if not len(sys.argv) in (7,8):
-        print ('')
-        print ('This script makes a homogeneous transformation matrix,')
-        print ('angles of which is defined by Z-X-Z Euler angles.')
-        print ('')
-        print ('Usage: % SCRIPT [alpha] [beta] [gamma] [x] [y] [z] [[output]]')
-        print ('')
-        print ('When "output" is specified, the matrix will be written in the file.')
-        print ('Otherwise STDOUT is used to display.')
+        print('')
+        print('This script makes a homogeneous transformation matrix,')
+        print('angles of which is defined by Z-X-Z Euler angles.')
+        print('')
+        print('Usage: % SCRIPT [alpha] [beta] [gamma] [x] [y] [z] [[output]]')
+        print('')
+        print('When "output" is specified, the matrix will be written in the file.')
+        print('Otherwise STDOUT is used to display.')
         sys.exit(2)
 
     a = float(sys.argv[1])

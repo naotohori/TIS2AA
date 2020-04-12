@@ -182,7 +182,7 @@ def calc_pseudo(r1, r2, r3, phos="P", sugar="C4", flg_degree=True, flg_360=True)
         if n == 9:
             xyzS1 /= 9.0
         else:
-            print 'Error: n != 9 for xyzS1 in calc_pseudo'
+            print('Error: n != 9 for xyzS1 in calc_pseudo')
             sys.exit(2)
 
         xyzS2 = np.zeros((3,))
@@ -202,7 +202,7 @@ def calc_pseudo(r1, r2, r3, phos="P", sugar="C4", flg_degree=True, flg_360=True)
         if n == 9:
             xyzS2 /= 9.0
         else:
-            print 'Error: n != 9 for xyzS2 in calc_pseudo'
+            print('Error: n != 9 for xyzS2 in calc_pseudo')
             sys.exit(2)
 
         xyzS3 = np.zeros((3,))
@@ -222,7 +222,7 @@ def calc_pseudo(r1, r2, r3, phos="P", sugar="C4", flg_degree=True, flg_360=True)
         if n == 9:
             xyzS3 /= 9.0
         else:
-            print 'Error: n != 9 for xyzS2 in calc_pseudo'
+            print('Error: n != 9 for xyzS2 in calc_pseudo')
 
     if phos == 'P':
         for a in r2.atoms:
@@ -243,7 +243,7 @@ def calc_pseudo(r1, r2, r3, phos="P", sugar="C4", flg_degree=True, flg_360=True)
         if n == 3:
             xyzP2 /= 3.0
         else:
-            print 'Error: n != 3 for xyzP2 in calc_pseudo'
+            print('Error: n != 3 for xyzP2 in calc_pseudo')
 
         xyzP3 = np.zeros((3,))
         n = 0
@@ -256,7 +256,7 @@ def calc_pseudo(r1, r2, r3, phos="P", sugar="C4", flg_degree=True, flg_360=True)
         if n == 3:
             xyzP3 /= 3.0
         else:
-            print 'Error: n != 3 for xyzP3 in calc_pseudo'
+            print('Error: n != 3 for xyzP3 in calc_pseudo')
 
     eta = torsion(xyzS1, xyzP2, xyzS2, xyzP3, flg_degree=flg_degree, flg_360=flg_360)
     theta = torsion(xyzP2, xyzS2, xyzP3, xyzS3, flg_degree=flg_degree, flg_360=flg_360)

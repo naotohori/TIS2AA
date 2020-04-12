@@ -21,18 +21,18 @@ class Atom :
         self.charge = 0
         
     def show(self):
-        print ('serial:', self.serial)
-        print ('name:', self.name)
-        print ('alt_loc:', self.alt_loc)
-        print ('res_name:', self.res_name)
-        print ('chain_id:', self.chain_id)
-        print ('res_seq:', self.res_seq)
-        print ('ins_code', self.ins_code)
-        print ('xyz', self.xyz.x, self.xyz.y, self.xyz.z)
-        print ('occupancy', self.occupancy)
-        print ('temp_factor', self.temp_factor)
-        print ('element', self.element)
-        print ('charge', self.charge)
+        print('serial:', self.serial)
+        print('name:', self.name)
+        print('alt_loc:', self.alt_loc)
+        print('res_name:', self.res_name)
+        print('chain_id:', self.chain_id)
+        print('res_seq:', self.res_seq)
+        print('ins_code', self.ins_code)
+        print('xyz', self.xyz.x, self.xyz.y, self.xyz.z)
+        print('occupancy', self.occupancy)
+        print('temp_factor', self.temp_factor)
+        print('element', self.element)
+        print('charge', self.charge)
         
 class Residue :
     def __init__(self):
@@ -63,7 +63,7 @@ class Chain :
     def push_residue(self, r):
         residue_id = len(self.residues)
         num_atom = len(r.atoms)
-        for i in xrange(num_atom):
+        for i in range(num_atom):
             self._where_is_atomX.append((residue_id, i))
         self.residues.append(r)
         

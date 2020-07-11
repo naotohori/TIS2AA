@@ -1,0 +1,3 @@
+include RNA09.nts
+recursive-include examples *
+recursive-include doc *

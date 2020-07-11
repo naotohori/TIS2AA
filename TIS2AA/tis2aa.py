@@ -17,8 +17,7 @@ import copy
 ################################################################################
 """ Selection of a database """
 SUGAR_MARK = "'"
-#BASEDIR = os.path.expanduser("~/TIS2AA/")
-BASEDIR = '%s/TIS2AA/' % os.environ['HOME']
+BASEDIR = os.path.dirname(os.path.realpath(__file__)) + '../'
 
 """ Parameters to search library """
 PSEUDO_BIN = 2.0  # +/- 2.5  ===>  bins of 5 degree

@@ -1,3 +1,11 @@
 *.pyc
 RNA09PB
 NDB
+RNAlibraries
+RNA09_FRAG_AA
+RNA09_FRAG_CG
+DNA_DC_FRAG_AA
+DNA_DC_FRAG_CG
+DNA_naked
+DNA_pro
+*.tar.gz

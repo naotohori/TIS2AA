@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 
-DIR_NAB = "/home/hori/TIS2AA/nab"
-SUGAR_MARK = "'"
+import os
 from pdbfile import PdbFile
 from pdb_elements import Chain, Residue
 from mtx_coord_transform import mtx_crd_transform
@@ -10,6 +9,9 @@ import copy
 import numpy as np
 import sys
 import argparse
+
+DIR_NAB = os.path.dirname(os.path.realpath(__file__)) + "../nab"
+SUGAR_MARK = "'"
 
 ''' INPUT '''
 parser = argparse.ArgumentParser(

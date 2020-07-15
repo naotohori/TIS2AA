@@ -4,29 +4,71 @@ import math
 import numpy as np
 import glob
 import os
+import sys
+
 from pdbfile import PdbFile
-from pdb_elements import Chain
+from pdb_elements import Chain, Residue
 from torsion import torsion
 
-MIN_NUM_ATOM_PER_NT = 22
+
 flg_PDB = True  # True: output PDB for each fragment
 # False: only make a list
 
-TARGET = 'RNA09'
-PDBGLOB = 'RNA09/pdb/*.pdb'
-SUGAR_MARK = "'"
-LIBPDBAA = 'RNA09_FRAG_AA/'
+mol_type = "DNA"
+# "RNA"
+# "DNA"
+
+cgmodel = 'TISDNA'
+# "TISRNA"
+# "TISDNA"
+
+BASE_DIR = os.path.dirname(os.path.realpath(__file__)) + '/../'
 
 
-# TARGET = 'RNA05'
-# PDBGLOB = 'RNA05/pdb/*.pdb'
-# SUGAR_MARK = "*"
-# LIBPDBAA = 'RNA05_FRAG_AA/'
+if cgmodel == 'TISRNA':
 
-# TARGET = 'RNAlibraries'
-# PDBGLOB = 'RNAlibraries/ROT-5/*.pdb'
-# SUGAR_MARK = "'"
+    SUGAR_MARK = "'"
+    PDBGLOB = BASE_DIR + 'RNA09/pdb/*.pdb'
+    LIBPDBAA = BASE_DIR + 'RNA09_FRAG_AA/'
+    FILE_NTS = 'RNA09.nts'
+    FILE_NTSALL = 'RNA09.ntsall'
 
+    # PDBGLOB = BASE_DIR + 'RNA05/pdb/*.pdb'
+    # LIBPDBAA = BASE_DIR + 'RNA05_FRAG_AA/'
+    # SUGAR_MARK = "*"
+    # FILE_NTS = 'RNA05.nts'
+    # FILE_NTSALL = 'RNA05.ntsall'
+    
+    # PDBGLOB = BASE_DIR + 'RNAlibraries/ROT-5/*.pdb'
+    # LIBPDBAA = BASE_DIR + 'RNAlibraries_FRAG_AA/'
+    # SUGAR_MARK = "'"
+    
+    MIN_NUM_ATOM_PER_NT = 22
+
+    flg_check_Bfactor = True
+    BFACTOR_CUTOFF = 60.0
+
+    flg_include_pre_O = False
+    flg_require_H = True
+
+elif cgmodel == 'TISDNA':
+
+    SUGAR_MARK = "'"
+    PDBGLOB = BASE_DIR + 'DNA_*/clean_*.pdb'
+    LIBPDBAA = BASE_DIR + 'DNA_FRAG_AA/'
+    FILE_NTS = 'DNA.nts'
+    FILE_NTSALL = 'DNA.ntsall'
+
+    MIN_NUM_ATOM_PER_NT = 19
+
+    flg_check_Bfactor = False
+    BFACTOR_CUTOFF = 0.0
+
+    flg_include_pre_O = True
+    flg_require_H = False
+
+
+############################ Functions 
 
 def check_necessary_atoms_exist(res, res_name):
     """
@@ -38,52 +80,87 @@ def check_necessary_atoms_exist(res, res_name):
     # Phosphate 
     if ((atomnames.count("P") != 1 or
          atomnames.count("O1P") != 1 or atomnames.count("O2P") != 1)
-            and
-            (atomnames.count("P") != 1 or
-             atomnames.count("OP1") != 1 or atomnames.count("OP2") != 1)):
+        and
+        (atomnames.count("P") != 1 or
+         atomnames.count("OP1") != 1 or atomnames.count("OP2") != 1)):
+
         return False
 
     # Sugar
-    if (atomnames.count("O5%s" % SUGAR_MARK) != 1 or atomnames.count("C5%s" % SUGAR_MARK) != 1 or
-            atomnames.count("C4%s" % SUGAR_MARK) != 1 or atomnames.count("O4%s" % SUGAR_MARK) != 1 or
-            atomnames.count("C3%s" % SUGAR_MARK) != 1 or atomnames.count("O3%s" % SUGAR_MARK) != 1 or
-            atomnames.count("C2%s" % SUGAR_MARK) != 1 or atomnames.count("O2%s" % SUGAR_MARK) != 1 or
-            atomnames.count("C1%s" % SUGAR_MARK) != 1 or
-            atomnames.count("H5%s" % SUGAR_MARK) != 1 or atomnames.count("H5%s%s" % (SUGAR_MARK, SUGAR_MARK)) != 1 or
-            atomnames.count("H4%s" % SUGAR_MARK) != 1 or atomnames.count("H3%s" % SUGAR_MARK) != 1 or
-            atomnames.count("H2%s" % SUGAR_MARK) != 1 or atomnames.count("HO2%s" % SUGAR_MARK) != 1 or
-            atomnames.count("H1%s" % SUGAR_MARK) != 1):
+    if (atomnames.count("O5%s" % SUGAR_MARK) != 1
+        or atomnames.count("C5%s" % SUGAR_MARK) != 1 
+        or atomnames.count("C4%s" % SUGAR_MARK) != 1
+        or atomnames.count("O4%s" % SUGAR_MARK) != 1
+        or atomnames.count("C3%s" % SUGAR_MARK) != 1
+        or atomnames.count("O3%s" % SUGAR_MARK) != 1
+        or atomnames.count("C2%s" % SUGAR_MARK) != 1
+        or atomnames.count("C1%s" % SUGAR_MARK) != 1):
+
         return False
+
+    if mol_type == 'RNA':
+        if atomnames.count("O2%s" % SUGAR_MARK) != 1:
+            return False
+
+    if flg_require_H:
+        if (atomnames.count("H5%s" % SUGAR_MARK) != 1
+            or atomnames.count("H5%s%s" % (SUGAR_MARK, SUGAR_MARK)) != 1
+            or atomnames.count("H4%s" % SUGAR_MARK) != 1
+            or atomnames.count("H3%s" % SUGAR_MARK) != 1 
+            or atomnames.count("H2%s" % SUGAR_MARK) != 1
+            or atomnames.count("HO2%s" % SUGAR_MARK) != 1
+            or atomnames.count("H1%s" % SUGAR_MARK) != 1):
+
+            return False
 
     # Base 
     if (atomnames.count("N1") != 1 or atomnames.count("C2") != 1 or
-            atomnames.count("N3") != 1 or atomnames.count("C4") != 1 or
-            atomnames.count("C5") != 1 or atomnames.count("C6") != 1):
+        atomnames.count("N3") != 1 or atomnames.count("C4") != 1 or
+        atomnames.count("C5") != 1 or atomnames.count("C6") != 1):
+
         return False
 
-    if res_name in ("C", "U"):
+    if res_name in ("C", "U", "DC", "DT"):
+
         if atomnames.count("O2") != 1:
             return False
-        if res_name == "C":
+
+        if res_name == "C" or res_name == "DC":
+            
             if atomnames.count("N4") != 1:
                 return False
-        if res_name == "U":
+
+        if res_name == "U" or res_name == "DT":
+
             if atomnames.count("O4") != 1:
                 return False
 
-    if res_name in ("A", "G"):
+        if res_name == "DT":
+
+            if atomnames.count("C7") != 1:
+                return False
+
+    if res_name in ("A", "G", "DA", "DG"):
+
         if atomnames.count("N7") != 1:
             return False
+
         if atomnames.count("C8") != 1:
             return False
+
         if atomnames.count("N9") != 1:
             return False
-        if res_name == "G":
+
+        if res_name == "G" or res_name == "DG":
+
             if atomnames.count("N2") != 1:
                 return False
+
             if atomnames.count("O6") != 1:
                 return False
-        if res_name == "A":
+
+        if res_name == "A" or res_name == "DA":
+
             if atomnames.count("N6") != 1:
                 return False
 
@@ -115,9 +192,9 @@ def calc_pucker(res, res_next):
     xyzC3 = res.find_atom_by_name("C3%s" % SUGAR_MARK).xyz.get_as_ndarray()
     xyzO3 = res.find_atom_by_name("O3%s" % SUGAR_MARK).xyz.get_as_ndarray()
     xyzC1 = res.find_atom_by_name("C1%s" % SUGAR_MARK).xyz.get_as_ndarray()
-    if res.atoms[0].res_name.strip() in ("U", "C"):
+    if res.atoms[0].res_name.strip() in ("U", "C", "DT", "DC"):
         xyzN1N9 = res.find_atom_by_name("N1").xyz.get_as_ndarray()
-    elif res.atoms[0].res_name.strip() in ("A", "G"):
+    elif res.atoms[0].res_name.strip() in ("A", "G", "DA", "DG"):
         xyzN1N9 = res.find_atom_by_name("N9").xyz.get_as_ndarray()
 
     #    for a in res.atoms:
@@ -165,48 +242,89 @@ def calc_pseudo(r1, r2, r3, phos="P", sugar="C4", flg_degree=True, flg_360=True)
                 xyzS3 = a.xyz.get_as_ndarray()
 
     elif sugar == 'geo':
+
         xyzS1 = np.zeros((3,))
         n = 0
+
         for a in r1.atoms:
             if (a.name.strip() == "C1%s" % SUGAR_MARK or
-                    a.name.strip() == "C2%s" % SUGAR_MARK or
-                    a.name.strip() == "O2%s" % SUGAR_MARK or
-                    a.name.strip() == "C3%s" % SUGAR_MARK or
-                    a.name.strip() == "O3%s" % SUGAR_MARK or
-                    a.name.strip() == "C4%s" % SUGAR_MARK or
-                    a.name.strip() == "O4%s" % SUGAR_MARK or
-                    a.name.strip() == "C5%s" % SUGAR_MARK or
-                    a.name.strip() == "O5%s" % SUGAR_MARK):
+                a.name.strip() == "C2%s" % SUGAR_MARK or
+                a.name.strip() == "O2%s" % SUGAR_MARK or
+                a.name.strip() == "C3%s" % SUGAR_MARK or
+                a.name.strip() == "O3%s" % SUGAR_MARK or
+                a.name.strip() == "C4%s" % SUGAR_MARK or
+                a.name.strip() == "O4%s" % SUGAR_MARK or
+                a.name.strip() == "C5%s" % SUGAR_MARK or
+                a.name.strip() == "O5%s" % SUGAR_MARK):
+
                 xyzS1 += a.xyz.get_as_ndarray()
                 n += 1
-        if n == 9:
-            xyzS1 /= 9.0
+
+        if mol_type == "RNA":
+
+            if n == 9:
+                xyzS1 /= 9.0
+
+            else:
+                print('Error: n != 9 for xyzS1 in calc_pseudo')
+                sys.exit(2)
+
+        elif mol_type == "DNA":
+
+            if n == 8:
+                xyzS1 /= 8.0
+
+            else:
+                print('Error: n != 8 for xyzS1 in calc_pseudo')
+                sys.exit(2)
+
         else:
-            print('Error: n != 9 for xyzS1 in calc_pseudo')
+            print('Error: mol_type is neither DNA or RNA (1)')
             sys.exit(2)
 
         xyzS2 = np.zeros((3,))
         n = 0
+
         for a in r2.atoms:
             if (a.name.strip() == "C1%s" % SUGAR_MARK or
-                    a.name.strip() == "C2%s" % SUGAR_MARK or
-                    a.name.strip() == "O2%s" % SUGAR_MARK or
-                    a.name.strip() == "C3%s" % SUGAR_MARK or
-                    a.name.strip() == "O3%s" % SUGAR_MARK or
-                    a.name.strip() == "C4%s" % SUGAR_MARK or
-                    a.name.strip() == "O4%s" % SUGAR_MARK or
-                    a.name.strip() == "C5%s" % SUGAR_MARK or
-                    a.name.strip() == "O5%s" % SUGAR_MARK):
+                a.name.strip() == "C2%s" % SUGAR_MARK or
+                a.name.strip() == "O2%s" % SUGAR_MARK or
+                a.name.strip() == "C3%s" % SUGAR_MARK or
+                a.name.strip() == "O3%s" % SUGAR_MARK or
+                a.name.strip() == "C4%s" % SUGAR_MARK or
+                a.name.strip() == "O4%s" % SUGAR_MARK or
+                a.name.strip() == "C5%s" % SUGAR_MARK or
+                a.name.strip() == "O5%s" % SUGAR_MARK):
+                
                 xyzS2 += a.xyz.get_as_ndarray()
                 n += 1
-        if n == 9:
-            xyzS2 /= 9.0
+
+        if mol_type == "RNA":
+
+            if n == 9:
+                xyzS2 /= 9.0
+
+            else:
+                print('Error: n != 9 for xyzS2 in calc_pseudo')
+                sys.exit(2)
+
+        elif mol_type == "DNA":
+
+            if n == 8:
+                xyzS2 /= 8.0
+
+            else:
+                print('Error: n != 8 for xyzS2 in calc_pseudo')
+                sys.exit(2)
+
         else:
-            print('Error: n != 9 for xyzS2 in calc_pseudo')
+            print('Error: mol_type is neither DNA or RNA (2)')
             sys.exit(2)
+
 
         xyzS3 = np.zeros((3,))
         n = 0
+
         for a in r3.atoms:
             if (a.name.strip() == "C1%s" % SUGAR_MARK or
                     a.name.strip() == "C2%s" % SUGAR_MARK or
@@ -217,44 +335,78 @@ def calc_pseudo(r1, r2, r3, phos="P", sugar="C4", flg_degree=True, flg_360=True)
                     a.name.strip() == "O4%s" % SUGAR_MARK or
                     a.name.strip() == "C5%s" % SUGAR_MARK or
                     a.name.strip() == "O5%s" % SUGAR_MARK):
+
                 xyzS3 += a.xyz.get_as_ndarray()
                 n += 1
-        if n == 9:
-            xyzS3 /= 9.0
+
+        if mol_type == "RNA":
+
+            if n == 9:
+                xyzS3 /= 9.0
+
+            else:
+                print('Error: n != 9 for xyzS3 in calc_pseudo')
+                sys.exit(2)
+
+        elif mol_type == "DNA":
+
+            if n == 8:
+                xyzS3 /= 8.0
+
+            else:
+                print('Error: n != 8 for xyzS3 in calc_pseudo')
+                sys.exit(2)
+
         else:
-            print('Error: n != 9 for xyzS2 in calc_pseudo')
+            print('Error: mol_type is neither DNA or RNA (3)')
+            sys.exit(2)
 
     if phos == 'P':
+
         for a in r2.atoms:
+
             if a.name.strip() == "P":
                 xyzP2 = a.xyz.get_as_ndarray()
+
         for a in r3.atoms:
+
             if a.name.strip() == "P":
                 xyzP3 = a.xyz.get_as_ndarray()
+
     elif phos == 'PO2':
+
         xyzP2 = np.zeros((3,))
         n = 0
+
         for a in r2.atoms:
             if (a.name.strip() == "P" or
-                    a.name.strip() == "OP1" or a.name.strip() == "OP2" or
-                    a.name.strip() == "O1P" or a.name.strip() == "O2P"):
+                a.name.strip() == "OP1" or a.name.strip() == "OP2" or
+                a.name.strip() == "O1P" or a.name.strip() == "O2P"):
+
                 xyzP2 += a.xyz.get_as_ndarray()
                 n += 1
+
         if n == 3:
             xyzP2 /= 3.0
+
         else:
             print('Error: n != 3 for xyzP2 in calc_pseudo')
 
         xyzP3 = np.zeros((3,))
         n = 0
+
         for a in r3.atoms:
+
             if (a.name.strip() == "P" or
-                    a.name.strip() == "OP1" or a.name.strip() == "OP2" or
-                    a.name.strip() == "O1P" or a.name.strip() == "O2P"):
+                a.name.strip() == "OP1" or a.name.strip() == "OP2" or
+                a.name.strip() == "O1P" or a.name.strip() == "O2P"):
+
                 xyzP3 += a.xyz.get_as_ndarray()
                 n += 1
+
         if n == 3:
             xyzP3 /= 3.0
+
         else:
             print('Error: n != 3 for xyzP3 in calc_pseudo')
 
@@ -264,20 +416,26 @@ def calc_pseudo(r1, r2, r3, phos="P", sugar="C4", flg_degree=True, flg_360=True)
     return eta, theta
 
 
+########################################################
+
 if __name__ == "__main__":
 
     seq = []
+
     # False if ...
     flg_natom = []  # Number of atoms is less than 22 (to remove terminal phosphate etc.)
-    #    (this is for checking consistency to Humphris-Narayanan & Pyle)
-    flg_restype = []  # Neither of AUGC
+
+    #    (for checking consistency to Humphris-Narayanan & Pyle)
+    flg_restype = []  # Neither of AUGC (RNA) or ATGC (DNA)
     flg_Bfact = []  # Any atom has B-factor more than 60
     flg_noterm = []  # Terminal nucleotide of the chain
+
     #   (after above tests)
     flg_atoms = []  # Any of necessary atom types does not exist
+
     # flg_clash   = []  #   Any atom clash with vdW radii overlap > 0.4 angstrom
 
-    pdbfiles = glob.glob(PDBGLOB)
+    pdbfiles = sorted(glob.glob(PDBGLOB))
 
     for pdbfile in pdbfiles:
 
@@ -294,33 +452,50 @@ if __name__ == "__main__":
                 resname = r.atoms[0].res_name.strip()
 
                 # Number of atoms in the nt
-                if len(r.atoms) < MIN_NUM_ATOM_PER_NT:  # To remove terminal phosphate and others
+                n_heavy_atoms = 0
+
+                for a in r.atoms:
+                    if a.name[0] != 'H':
+                        n_heavy_atoms += 1
+
+                if n_heavy_atoms < MIN_NUM_ATOM_PER_NT:  # To remove terminal phosphate and others
                     flg_natom.append(False)
                     flg_so_far = False
+
                 else:
                     flg_natom.append(True)
                     # print pdbfile, resname
 
                 # Sequence
-                if resname in ("A", "C", "U", "G"):
+                if mol_type == 'RNA' and resname in ("A", "C", "U", "G"):
                     flg_restype.append(True)
                     seq.append(resname)
+
+                elif mol_type == 'DNA' and resname in ("DA", "DC", "DT", "DG"):
+                    flg_restype.append(True)
+                    seq.append(resname)
+
                 elif resname in ("HOH", "CA", "MN", "BRO", "ROB"):
                     flg_restype.append(False)
                     flg_so_far = False
                     seq.append("o")  # others
+
                 else:
                     flg_restype.append(False)
                     flg_so_far = False
                     seq.append("m")  # modified
 
                 # B-factor
-                flg = True
-                for a in r.atoms:
-                    if a.temp_factor > 60.0:
-                        flg = False
-                        flg_so_far = False
-                flg_Bfact.append(flg)
+                if flg_check_Bfactor:
+                    flg = True
+                    for a in r.atoms:
+                        if a.temp_factor > BFACTOR_CUTOFF:
+                            flg = False
+                            flg_so_far = False
+                    flg_Bfact.append(flg)
+                else:
+                    for a in r.atoms:
+                        flg_Bfact.append(True)
 
                 # Terminal or not
                 if ir == 0 or ir == (c.num_res() - 1):
@@ -359,8 +534,8 @@ if __name__ == "__main__":
 
         # Itself passes all the quality test, AND both neighboring nucleotides are also qualified.
         if (flg_restype[i - 1] and flg_natom[i - 1] and flg_Bfact[i - 1] and flg_atoms[i - 1] and
-                flg_restype[i] and flg_natom[i] and flg_Bfact[i - 1] and flg_atoms[i] and
-                flg_restype[i + 1] and flg_natom[i + 1] and flg_Bfact[i + 1] and flg_atoms[i + 1]):
+            flg_restype[i] and flg_natom[i] and flg_Bfact[i - 1] and flg_atoms[i] and
+            flg_restype[i + 1] and flg_natom[i + 1] and flg_Bfact[i + 1] and flg_atoms[i + 1]):
             flg_final.append(True)
         else:
             flg_final.append(False)
@@ -368,8 +543,8 @@ if __name__ == "__main__":
     # #################################
     # # Output list
     # #################################
-    f_out = open('%s.nts_all' % TARGET, 'w')
-    f_final = open('%s.nts' % TARGET, 'w')
+    f_out = open('%s.nts_all' % FILE_NTS, 'w')
+    f_final = open('%s.nts' % FILE_NTSALL, 'w')
 
     puckers = []
 
@@ -441,7 +616,7 @@ if __name__ == "__main__":
                 if puc in (2, 3):
                     ifinal += 1
 
-                    f_final.write('%6i %6i %13s %2i %2s %4i %4i %s'
+                    f_final.write('%6i %6i %13s %2i %2s %4i %4i %4s'
                                   % (ifinal, iseq, os.path.basename(pdbfile)[:-4], ic + 1, r.atoms[0].chain_id,
                                      ir + 1, r.atoms[0].res_seq, seq[iseq]))
                     f_final.write('  %i' % puc)
@@ -454,6 +629,16 @@ if __name__ == "__main__":
 
                     if flg_PDB:
                         cout = Chain()
+
+                        if flg_include_pre_O:
+                            r = Residue()
+                            for a in c.residues[ir-2].atoms:
+                                if a.name.strip() == ("O5%s" % SUGAR_MARK):
+                                    r.push_atom(a)
+                                elif a.name.strip() == ("O3%s" % SUGAR_MARK):
+                                    r.push_atom(a)
+                            cout.push_residue(r)
+
                         cout.push_residue(c.residues[ir - 1])
                         cout.push_residue(c.residues[ir])
                         cout.push_residue(c.residues[ir + 1])

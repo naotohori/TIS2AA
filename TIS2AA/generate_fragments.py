@@ -543,8 +543,8 @@ if __name__ == "__main__":
     # #################################
     # # Output list
     # #################################
-    f_out = open(FILE_NTS, 'w')
-    f_final = open(FILE_NTSALL, 'w')
+    f_out = open(FILE_NTSALL, 'w')
+    f_final = open(FILE_NTS, 'w')
 
     puckers = []
 

@@ -31,7 +31,7 @@ if cgmodel == 'TISRNA':
     PDBGLOB = BASE_DIR + 'RNA09/pdb/*.pdb'
     LIBPDBAA = BASE_DIR + 'RNA09_FRAG_AA/'
     FILE_NTS = 'RNA09.nts'
-    FILE_NTSALL = 'RNA09.ntsall'
+    FILE_NTSALL = 'RNA09.nts_all'
 
     # PDBGLOB = BASE_DIR + 'RNA05/pdb/*.pdb'
     # LIBPDBAA = BASE_DIR + 'RNA05_FRAG_AA/'
@@ -57,7 +57,7 @@ elif cgmodel == 'TISDNA':
     PDBGLOB = BASE_DIR + 'DNA_*/clean_*.pdb'
     LIBPDBAA = BASE_DIR + 'DNA_FRAG_AA/'
     FILE_NTS = 'DNA.nts'
-    FILE_NTSALL = 'DNA.ntsall'
+    FILE_NTSALL = 'DNA.nts_all'
 
     MIN_NUM_ATOM_PER_NT = 19
 
@@ -543,8 +543,8 @@ if __name__ == "__main__":
     # #################################
     # # Output list
     # #################################
-    f_out = open('%s.nts_all' % FILE_NTS, 'w')
-    f_final = open('%s.nts' % FILE_NTSALL, 'w')
+    f_out = open(FILE_NTS, 'w')
+    f_final = open(FILE_NTSALL, 'w')
 
     puckers = []
 

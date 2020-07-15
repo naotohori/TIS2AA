@@ -14,11 +14,11 @@ from torsion import torsion
 flg_PDB = True  # True: output PDB for each fragment
 # False: only make a list
 
-mol_type = "DNA"
+mol_type = "RNA"
 # "RNA"
 # "DNA"
 
-cgmodel = 'TISDNA'
+cgmodel = 'TISRNA'
 # "TISRNA"
 # "TISDNA"
 
@@ -28,7 +28,7 @@ BASE_DIR = os.path.dirname(os.path.realpath(__file__)) + '/../'
 if cgmodel == 'TISRNA':
 
     SUGAR_MARK = "'"
-    PDBGLOB = BASE_DIR + 'RNA09/pdb/*.pdb'
+    PDBGLOB = BASE_DIR + 'RNA09PB/*.pdb'
     LIBPDBAA = BASE_DIR + 'RNA09_FRAG_AA/'
     FILE_NTS = 'RNA09.nts'
     FILE_NTSALL = 'RNA09.nts_all'
@@ -87,31 +87,34 @@ def check_necessary_atoms_exist(res, res_name):
         return False
 
     # Sugar
-    if (atomnames.count("O5%s" % SUGAR_MARK) != 1
-        or atomnames.count("C5%s" % SUGAR_MARK) != 1 
-        or atomnames.count("C4%s" % SUGAR_MARK) != 1
-        or atomnames.count("O4%s" % SUGAR_MARK) != 1
-        or atomnames.count("C3%s" % SUGAR_MARK) != 1
-        or atomnames.count("O3%s" % SUGAR_MARK) != 1
-        or atomnames.count("C2%s" % SUGAR_MARK) != 1
-        or atomnames.count("C1%s" % SUGAR_MARK) != 1):
+    if (atomnames.count("O5" + SUGAR_MARK) != 1
+        or atomnames.count("C5" + SUGAR_MARK) != 1 
+        or atomnames.count("C4" + SUGAR_MARK) != 1
+        or atomnames.count("O4" + SUGAR_MARK) != 1
+        or atomnames.count("C3" + SUGAR_MARK) != 1
+        or atomnames.count("O3" + SUGAR_MARK) != 1
+        or atomnames.count("C2" + SUGAR_MARK) != 1
+        or atomnames.count("C1" + SUGAR_MARK) != 1):
 
         return False
 
     if mol_type == 'RNA':
-        if atomnames.count("O2%s" % SUGAR_MARK) != 1:
+        if atomnames.count("O2" + SUGAR_MARK) != 1:
             return False
 
     if flg_require_H:
-        if (atomnames.count("H5%s" % SUGAR_MARK) != 1
-            or atomnames.count("H5%s%s" % (SUGAR_MARK, SUGAR_MARK)) != 1
-            or atomnames.count("H4%s" % SUGAR_MARK) != 1
-            or atomnames.count("H3%s" % SUGAR_MARK) != 1 
-            or atomnames.count("H2%s" % SUGAR_MARK) != 1
-            or atomnames.count("HO2%s" % SUGAR_MARK) != 1
-            or atomnames.count("H1%s" % SUGAR_MARK) != 1):
+        if (atomnames.count("H5" + SUGAR_MARK) != 1
+            or atomnames.count("H5" + SUGAR_MARK + SUGAR_MARK) != 1
+            or atomnames.count("H4" + SUGAR_MARK) != 1
+            or atomnames.count("H3" + SUGAR_MARK) != 1 
+            or atomnames.count("H2" + SUGAR_MARK) != 1
+            or atomnames.count("H1" + SUGAR_MARK) != 1):
 
             return False
+        
+        if mol_type == "RNA":
+            if atomnames.count("HO2" + SUGAR_MARK) != 1:
+                return False
 
     # Base 
     if (atomnames.count("N1") != 1 or atomnames.count("C2") != 1 or
@@ -187,11 +190,11 @@ def calc_pucker(res, res_next):
             2 = 2'-end
             3 = 3'-end
     """
-    xyzC5 = res.find_atom_by_name("C5%s" % SUGAR_MARK).xyz.get_as_ndarray()
-    xyzC4 = res.find_atom_by_name("C4%s" % SUGAR_MARK).xyz.get_as_ndarray()
-    xyzC3 = res.find_atom_by_name("C3%s" % SUGAR_MARK).xyz.get_as_ndarray()
-    xyzO3 = res.find_atom_by_name("O3%s" % SUGAR_MARK).xyz.get_as_ndarray()
-    xyzC1 = res.find_atom_by_name("C1%s" % SUGAR_MARK).xyz.get_as_ndarray()
+    xyzC5 = res.find_atom_by_name("C5" + SUGAR_MARK).xyz.get_as_ndarray()
+    xyzC4 = res.find_atom_by_name("C4" + SUGAR_MARK).xyz.get_as_ndarray()
+    xyzC3 = res.find_atom_by_name("C3" + SUGAR_MARK).xyz.get_as_ndarray()
+    xyzO3 = res.find_atom_by_name("O3" + SUGAR_MARK).xyz.get_as_ndarray()
+    xyzC1 = res.find_atom_by_name("C1" + SUGAR_MARK).xyz.get_as_ndarray()
     if res.atoms[0].res_name.strip() in ("U", "C", "DT", "DC"):
         xyzN1N9 = res.find_atom_by_name("N1").xyz.get_as_ndarray()
     elif res.atoms[0].res_name.strip() in ("A", "G", "DA", "DG"):
@@ -232,13 +235,13 @@ def calc_pucker(res, res_next):
 def calc_pseudo(r1, r2, r3, phos="P", sugar="C4", flg_degree=True, flg_360=True):
     if sugar == 'C4':
         for a in r1.atoms:
-            if a.name.strip() == "C4%s" % SUGAR_MARK:
+            if a.name.strip() == "C4" + SUGAR_MARK:
                 xyzS1 = a.xyz.get_as_ndarray()
         for a in r2.atoms:
-            if a.name.strip() == "C4%s" % SUGAR_MARK:
+            if a.name.strip() == "C4" + SUGAR_MARK:
                 xyzS2 = a.xyz.get_as_ndarray()
         for a in r3.atoms:
-            if a.name.strip() == "C4%s" % SUGAR_MARK:
+            if a.name.strip() == "C4" + SUGAR_MARK:
                 xyzS3 = a.xyz.get_as_ndarray()
 
     elif sugar == 'geo':
@@ -247,18 +250,24 @@ def calc_pseudo(r1, r2, r3, phos="P", sugar="C4", flg_degree=True, flg_360=True)
         n = 0
 
         for a in r1.atoms:
-            if (a.name.strip() == "C1%s" % SUGAR_MARK or
-                a.name.strip() == "C2%s" % SUGAR_MARK or
-                a.name.strip() == "O2%s" % SUGAR_MARK or
-                a.name.strip() == "C3%s" % SUGAR_MARK or
-                a.name.strip() == "O3%s" % SUGAR_MARK or
-                a.name.strip() == "C4%s" % SUGAR_MARK or
-                a.name.strip() == "O4%s" % SUGAR_MARK or
-                a.name.strip() == "C5%s" % SUGAR_MARK or
-                a.name.strip() == "O5%s" % SUGAR_MARK):
+            if (a.name.strip() == "C1" + SUGAR_MARK or
+                a.name.strip() == "C2" + SUGAR_MARK or
+                a.name.strip() == "C3" + SUGAR_MARK or
+                a.name.strip() == "O3" + SUGAR_MARK or
+                a.name.strip() == "C4" + SUGAR_MARK or
+                a.name.strip() == "O4" + SUGAR_MARK or
+                a.name.strip() == "C5" + SUGAR_MARK or
+                a.name.strip() == "O5" + SUGAR_MARK):
 
                 xyzS1 += a.xyz.get_as_ndarray()
                 n += 1
+            
+            if mol_type == "RNA" and a.name.strip() == "O2" + SUGAR_MARK:
+
+                xyzS1 += a.xyz.get_as_ndarray()
+                n += 1
+
+
 
         if mol_type == "RNA":
 
@@ -286,16 +295,20 @@ def calc_pseudo(r1, r2, r3, phos="P", sugar="C4", flg_degree=True, flg_360=True)
         n = 0
 
         for a in r2.atoms:
-            if (a.name.strip() == "C1%s" % SUGAR_MARK or
-                a.name.strip() == "C2%s" % SUGAR_MARK or
-                a.name.strip() == "O2%s" % SUGAR_MARK or
-                a.name.strip() == "C3%s" % SUGAR_MARK or
-                a.name.strip() == "O3%s" % SUGAR_MARK or
-                a.name.strip() == "C4%s" % SUGAR_MARK or
-                a.name.strip() == "O4%s" % SUGAR_MARK or
-                a.name.strip() == "C5%s" % SUGAR_MARK or
-                a.name.strip() == "O5%s" % SUGAR_MARK):
+            if (a.name.strip() == "C1" + SUGAR_MARK or
+                a.name.strip() == "C2" + SUGAR_MARK or
+                a.name.strip() == "C3" + SUGAR_MARK or
+                a.name.strip() == "O3" + SUGAR_MARK or
+                a.name.strip() == "C4" + SUGAR_MARK or
+                a.name.strip() == "O4" + SUGAR_MARK or
+                a.name.strip() == "C5" + SUGAR_MARK or
+                a.name.strip() == "O5" + SUGAR_MARK):
                 
+                xyzS2 += a.xyz.get_as_ndarray()
+                n += 1
+            
+            if mol_type == "RNA" and a.name.strip() == "O2" + SUGAR_MARK:
+
                 xyzS2 += a.xyz.get_as_ndarray()
                 n += 1
 
@@ -326,15 +339,19 @@ def calc_pseudo(r1, r2, r3, phos="P", sugar="C4", flg_degree=True, flg_360=True)
         n = 0
 
         for a in r3.atoms:
-            if (a.name.strip() == "C1%s" % SUGAR_MARK or
-                    a.name.strip() == "C2%s" % SUGAR_MARK or
-                    a.name.strip() == "O2%s" % SUGAR_MARK or
-                    a.name.strip() == "C3%s" % SUGAR_MARK or
-                    a.name.strip() == "O3%s" % SUGAR_MARK or
-                    a.name.strip() == "C4%s" % SUGAR_MARK or
-                    a.name.strip() == "O4%s" % SUGAR_MARK or
-                    a.name.strip() == "C5%s" % SUGAR_MARK or
-                    a.name.strip() == "O5%s" % SUGAR_MARK):
+            if (a.name.strip() == "C1" + SUGAR_MARK or
+                    a.name.strip() == "C2" + SUGAR_MARK or
+                    a.name.strip() == "C3" + SUGAR_MARK or
+                    a.name.strip() == "O3" + SUGAR_MARK or
+                    a.name.strip() == "C4" + SUGAR_MARK or
+                    a.name.strip() == "O4" + SUGAR_MARK or
+                    a.name.strip() == "C5" + SUGAR_MARK or
+                    a.name.strip() == "O5" + SUGAR_MARK):
+
+                xyzS3 += a.xyz.get_as_ndarray()
+                n += 1
+            
+            if mol_type == "RNA" and a.name.strip() == "O2" + SUGAR_MARK:
 
                 xyzS3 += a.xyz.get_as_ndarray()
                 n += 1
@@ -634,7 +651,7 @@ if __name__ == "__main__":
                             r = Residue()
 
                             for a in c.residues[ir-2].atoms:
-                                if a.name.strip() == ("O3%s" % SUGAR_MARK):
+                                if a.name.strip() == ("O3" + SUGAR_MARK):
                                     r.push_atom(a)
 
                             cout.push_residue(r)

@@ -1,23 +1,24 @@
 #!/usr/bin/env python
-''' Conversion from TIS model to All-atomistic model'''
+''' Reconstruction of Atomistic DNA/RNA model from TIS-CG model'''
 __author__ = "Naoto Hori"
 
 import os
+import sys
+import copy
 import argparse
+import numpy as np
+
 from pdb_elements import Chain, Residue, Atom
 from coord import Coord
 from pdbfile import PdbFile
 from torsion import torsion
 from mtx_coord_transform import mtx_crd_transform
 from CalcROT import calcrotation
-import sys
-import numpy as np
-import copy
 
 ################################################################################
 """ Selection of a database """
 SUGAR_MARK = "'"
-BASEDIR = os.path.dirname(os.path.realpath(__file__)) + '../'
+BASEDIR = os.path.dirname(os.path.realpath(__file__)) + '/../'
 
 """ Parameters to search library """
 PSEUDO_BIN = 2.0  # +/- 2.5  ===>  bins of 5 degree
@@ -39,8 +40,12 @@ def angle_diff(ang1, ang2):
 if __name__ == "__main__":
 
     parser = argparse.ArgumentParser(
-        description='Structural conversion from TIS model to All-atomistic model',
+        description='Reconstruction of atomistic DNA/RNA model from Three-Interaction-Site model',
         formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+
+    parser.add_argument('--model', dest='model', default='TISRNA',
+                        action='store',
+                        help='Model TISDNA or TISRNA') 
 
     parser.add_argument('--binpseudo', dest='pseudo_bin', default=PSEUDO_BIN,
                         action='store', type=float,
@@ -79,9 +84,18 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
 
-    LIBPDBAA = args.basedir + 'RNA09_FRAG_AA/'  # input
-    LIBPDBCG = args.basedir + 'RNA09_FRAG_CG/'  # output
-    LISTFILE = args.basedir + 'RNA09.nts'
+    if args.model == 'TIARNA':
+        LIBPDBAA = args.basedir + 'RNA09_FRAG_AA/'  # input
+        LIBPDBCG = args.basedir + 'RNA09_FRAG_CG/'  # output
+        LISTFILE = args.basedir + 'RNA09.nts'
+    elif args.model == 'TISDNA':
+        LIBPDBAA = args.basedir + 'DNA_FRAG_AA/'  # input
+        LIBPDBCG = args.basedir + 'DNA_FRAG_CG/'  # output
+        LISTFILE = args.basedir + 'DNA.nts'
+    else:
+        print('Error: --model must be either TISRNA or TISDNA')
+        sys.exit(2)
+    
 
     ################################################################################
     """ Open log file """
@@ -114,43 +128,60 @@ if __name__ == "__main__":
         """ Store sequence and coordinates of CG model """
         for ir, r_cg in enumerate(c_cg.residues):
 
-            flg_P = False
-            flg_S = False
-            flg_B = False
+            nP = 0
+            nS = 0
+            nB = 0
             for a in r_cg.atoms:
                 if a.name.strip() == 'P':
                     xyzs_P.append(a.xyz.get_as_list())
-                    flg_P = True
+                    nP += 1
                 elif a.name.strip() == 'S':
                     xyzs_S.append(a.xyz.get_as_list())
-                    flg_S = True
+                    nS += 1
                 elif a.name.strip()[1] == 'b':
                     xyzs_B.append(a.xyz.get_as_list())
-                    flg_B = True
-            if not flg_P:
-                xyzs_P.append(False)
-            if not flg_S:
-                print('no S in cg model, ir=', ir)
-                f_log.write('no S in cg model, ir=%i' % ir)
-            if not flg_B:
-                print('no B in cg model, ir=', ir)
-                f_log.write('no B in cg model, ir=%i' % ir)
+                    nB += 1
+
+            if nP > 1:
+                print('Error: more than 1 P in cg model, ir = %i' % ir)
+                f_log.write('Error: more than 1 P in cg model, ir = %i' % ir)
+            elif nP == 0:
+                """ This residue must be the 5'-end """
+                if ir == 0:
+                    """ Add a dummy """
+                    xyzs_P.append(False)
+                else:
+                    print('Error: no P in cg model, ir = %i' % ir)
+                    f_log.write('Error: no P in cg model, ir = %i' % ir)
+
+            if nS > 1:
+                print('Error: more than 1 S in cg model, ir = %i' % ir)
+                f_log.write('Error: more than 1 S in cg model, ir = %i' % ir)
+            elif nS == 0:
+                print('Error: no S in cg model, ir = %i' % ir)
+                f_log.write('Error: no S in cg model, ir = %i' % ir)
+
+            if nB > 1:
+                print('Error: more than 1 B in cg model, ir = %i' % ir)
+                f_log.write('Error: more than 1 B in cg model, ir = %i' % ir)
+            elif nS == 0:
+                print('Error: no B in cg model, ir = %i' % ir)
+                f_log.write('Error: no B in cg model, ir = %i' % ir)
 
             res_name = r_cg.atoms[0].res_name.strip()[-1]
-            if res_name in ('A', 'U', 'G', 'C'):
+            if res_name in ('A', 'U', 'G', 'C', 'T'):
                 seq.append(res_name)
             else:
-                print('res_name is not valid:', r_cg.atoms[0].res_name)
-                f_log.write('Warning: res_name is not valid: %s' %
-                            r_cg.atoms[0].res_name)
+                print('Error: res_name is not valid:', r_cg.atoms[0].res_name)
+                f_log.write('Warning: res_name is not valid: %s' % r_cg.atoms[0].res_name)
+                sys.exit(2)
 
         nres = len(c_cg.residues)
         c_aa = Chain()
 
         """ The first residue """
         if not args.circ:
-            xyzSBPS_ref = np.array(
-                [xyzs_S[0], xyzs_B[0], xyzs_P[1], xyzs_S[1]])
+            xyzSBPS_ref = np.array([xyzs_S[0], xyzs_B[0], xyzs_P[1], xyzs_S[1]])
             best_rmsd = 9999.9
             best_lib = 0
             best_mtx = None
@@ -158,17 +189,20 @@ if __name__ == "__main__":
                 p = PdbFile('%s/%06i_%s.pdb' % (LIBPDBCG, ilib+1, seq[0]))
                 p.open_to_read()
                 c = p.read_all()[0]
+
                 xyzSBPS = [c.residues[1].atoms[1].xyz.get_as_list(),  # S2
                            c.residues[1].atoms[2].xyz.get_as_list(),  # B2
                            c.residues[2].atoms[0].xyz.get_as_list(),  # P3
                            c.residues[2].atoms[1].xyz.get_as_list()]  # S3
-                rmsd, mat = calcrotation(np.transpose(
-                    xyzSBPS_ref), np.transpose(xyzSBPS))
+
+                rmsd, mat = calcrotation(np.transpose(xyzSBPS_ref), 
+                                         np.transpose(xyzSBPS))
 
                 if rmsd < best_rmsd:
                     best_rmsd = rmsd
                     best_lib = ilib + 1
                     best_mtx = mat
+
                     if rmsd <= args.rmsd_accept:
                         break
 
@@ -242,8 +276,7 @@ if __name__ == "__main__":
                     if best_rmsd <= args.rmsd_max:
                         break
                     else:
-                        print(
-                            'limit > PSEUDO_MAX; could not find library for ir=', ir)
+                        print('limit > PSEUDO_MAX; could not find library for ir=', ir)
                         f_log.write(
                             'Error: limit > PSEUDO_MAX; could not find library for ir=%i' % ir)
                         sys.exit(2)
@@ -271,13 +304,13 @@ if __name__ == "__main__":
                     p = PdbFile('%s/%06i_%s.pdb' % (LIBPDBCG, lib, seq[ir]))
                     p.open_to_read()
                     c = p.read_all()[0]
-                    xyzSPSB = [c.residues[0].atoms[1].xyz.get_as_list(),  # S1
+                    xyzSPSB = [c.residues[0].atoms[0].xyz.get_as_list(),  # S1
                                c.residues[1].atoms[0].xyz.get_as_list(),  # P2
                                c.residues[1].atoms[1].xyz.get_as_list(),  # S2
                                c.residues[1].atoms[2].xyz.get_as_list()]  # B2
 
-                    rmsd, mat = calcrotation(np.transpose(
-                        xyzSPSB_ref), np.transpose(xyzSPSB))
+                    rmsd, mat = calcrotation(np.transpose(xyzSPSB_ref), 
+                                             np.transpose(xyzSPSB))
                     p.close()
 
                     if rmsd < best_rmsd:
@@ -296,8 +329,9 @@ if __name__ == "__main__":
                 if best_rmsd <= args.rmsd_accept:
                     flg_found = True
 
-            f_log.write('%3i %6i  %6i %f  %f %f\n' % (
-                ir+1, len(cand_lib), best_lib, best_rmsd, best_angle[0], best_angle[1]))
+            f_log.write('%3i' % (ir+1,))
+            f_log.write(' %6i  %6i %f' % (len(cand_lib), best_lib, best_rmsd))
+            f_log.write('  %f %f\n' % (best_angle[0], best_angle[1]))
 
             p = PdbFile('%s/%06i_%s.pdb' % (LIBPDBAA, best_lib, seq[ir]))
             p.open_to_read()
@@ -346,7 +380,7 @@ if __name__ == "__main__":
                 p = PdbFile('%s/%06i_%s.pdb' % (LIBPDBCG, ilib+1, seq[-1]))
                 p.open_to_read()
                 c = p.read_all()[0]
-                xyzSPSB = [c.residues[0].atoms[1].xyz.get_as_list(),  # S-2
+                xyzSPSB = [c.residues[0].atoms[0].xyz.get_as_list(),  # S-2
                            c.residues[1].atoms[0].xyz.get_as_list(),  # P-1
                            c.residues[1].atoms[1].xyz.get_as_list(),  # S-1
                            c.residues[1].atoms[2].xyz.get_as_list()]  # B-1

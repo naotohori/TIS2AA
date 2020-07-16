@@ -14,11 +14,11 @@ from torsion import torsion
 flg_PDB = True  # True: output PDB for each fragment
 # False: only make a list
 
-mol_type = "RNA"
+mol_type = "DNA"
 # "RNA"
 # "DNA"
 
-cgmodel = 'TISRNA'
+cgmodel = 'TISDNA'
 # "TISRNA"
 # "TISDNA"
 
@@ -48,7 +48,7 @@ if cgmodel == 'TISRNA':
     flg_check_Bfactor = True
     BFACTOR_CUTOFF = 60.0
 
-    flg_include_pre_O3 = False
+    #flg_include_pre_O3 = False
     flg_require_H = True
 
 elif cgmodel == 'TISDNA':
@@ -64,7 +64,7 @@ elif cgmodel == 'TISDNA':
     flg_check_Bfactor = False
     BFACTOR_CUTOFF = 0.0
 
-    flg_include_pre_O3 = True
+    #flg_include_pre_O3 = True
     flg_require_H = False
 
 
@@ -647,14 +647,14 @@ if __name__ == "__main__":
                     if flg_PDB:
                         cout = Chain()
 
-                        if flg_include_pre_O3:
-                            r = Residue()
-
-                            for a in c.residues[ir-2].atoms:
-                                if a.name.strip() == ("O3" + SUGAR_MARK):
-                                    r.push_atom(a)
-
-                            cout.push_residue(r)
+                        #if flg_include_pre_O3:
+                        #    r = Residue()
+                        #
+                        #    for a in c.residues[ir-2].atoms:
+                        #        if a.name.strip() == ("O3" + SUGAR_MARK):
+                        #            r.push_atom(a)
+                        #
+                        #    cout.push_residue(r)
 
                         cout.push_residue(c.residues[ir - 1])
                         cout.push_residue(c.residues[ir])

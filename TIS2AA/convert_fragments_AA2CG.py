@@ -1,20 +1,27 @@
 #!/usr/bin/env python
 
-from coord import Coord
-from pdb_elements import Chain, Residue, Atom
-from pdbfile import PdbFile
 import os
 import glob
 
+from coord import Coord
+from pdb_elements import Chain, Residue, Atom
+from pdbfile import PdbFile
+
 ''' Selection of a database '''
 SUGAR_MARK = "'"
-LIBPDBAA = 'RNA09_FRAG_AA/'  # input
-LIBPDBCG = 'RNA09_FRAG_CG/'  # output
+BASE_DIR = os.path.dirname(os.path.realpath(__file__)) + '/../'
 
+#cgmodel = "TISRNA"
+#LIBPDBAA = BASE_DIR + 'RNA09_FRAG_AA/'  # input
+#LIBPDBCG = BASE_DIR + 'RNA09_FRAG_CG/'  # output
+#ATOMS_P = ('P', 'OP1', 'OP2')
 
-ATOMS_P = ('P', 'OP1', 'OP2')
+cgmodel = "TISDNA"
+LIBPDBAA =  BASE_DIR + 'DNA_FRAG_AA/'  # input
+LIBPDBCG =  BASE_DIR + 'DNA_FRAG_CG/'  # output
+ATOMS_P = ('P', 'OP1', 'OP2', "O5'")
 
-for path in glob.glob('%s/*_?.pdb' % LIBPDBAA):
+for path in sorted(glob.glob('%s/*_?.pdb' % LIBPDBAA)):
 
     pdb_in = PdbFile(path)
     pdb_in.open_to_read()
@@ -25,9 +32,15 @@ for path in glob.glob('%s/*_?.pdb' % LIBPDBAA):
 
     res_id = 0
     atom_id = 0
+
     for ir, r in enumerate(c.residues):
         xyz_P = Coord()
         nP = 0
+        if cgmodel == 'TISDNA' and ir > 0:
+            xyz_P += xyz_nextP
+            nP += 1
+        xyz_nextP = Coord()
+        nnextP = 0
         xyz_S = Coord()
         nS = 0
         xyz_B = Coord()
@@ -35,28 +48,41 @@ for path in glob.glob('%s/*_?.pdb' % LIBPDBAA):
 
         for a in r.atoms:
             name = a.name.strip()
+
             if name[0] == 'H':
                 continue
+
             elif name in ATOMS_P:
                 xyz_P += a.xyz
                 nP += 1
+
+            elif cgmodel == 'TISDNA' and name == 'O3'+SUGAR_MARK:
+                xyz_nextP += a.xyz
+                nnextP += 1
+
             elif name.find(SUGAR_MARK) != -1:
                 xyz_S += a.xyz
                 nS += 1
+
             else:
                 xyz_B += a.xyz
                 nB += 1
+
             nt = a.res_name.strip()
 
         res_id += 1
         r_cg = Residue()
 
-        if nP != 0:
+        # if nP != 0:
+        if ir > 0:
             atom_id += 1
             a = Atom()
             a.serial = atom_id
             a.name = ' P  '
-            a.res_name = 'R%s ' % nt
+            if cgmodel == 'TISRNA':
+                a.res_name = 'R%s ' % nt
+            else:
+                a.res_name = '%s ' % nt
             a.chain_id = 'A'
             a.res_seq = res_id
             a.xyz = xyz_P / float(nP)
@@ -67,7 +93,10 @@ for path in glob.glob('%s/*_?.pdb' % LIBPDBAA):
             a = Atom()
             a.serial = atom_id
             a.name = ' S  '
-            a.res_name = 'R%s ' % nt
+            if cgmodel == 'TISRNA':
+                a.res_name = 'R%s ' % nt
+            else:
+                a.res_name = '%s ' % nt
             a.chain_id = 'A'
             a.res_seq = res_id
             a.xyz = xyz_S / float(nS)
@@ -78,7 +107,10 @@ for path in glob.glob('%s/*_?.pdb' % LIBPDBAA):
             a = Atom()
             a.serial = atom_id
             a.name = ' B  '
-            a.res_name = 'R%s ' % nt
+            if cgmodel == 'TISRNA':
+                a.res_name = 'R%s ' % nt
+            else:
+                a.res_name = '%s ' % nt
             a.chain_id = 'A'
             a.res_seq = res_id
             a.xyz = xyz_B / float(nB)

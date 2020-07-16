@@ -14,21 +14,21 @@ BASE_DIR = os.path.dirname(os.path.realpath(__file__)) + '/../'
 STANDARD_BASE = BASE_DIR + 'standard_base.pdb'
 
 ''' Selection of a database '''
-SUGAR_MARK = "'"
-LIBPDBAA = BASE_DIR + 'RNA09_FRAG_AA/'
-LISTFILE = BASE_DIR + 'RNA09.nts'
-
-mol_type = "RNA"
-flg_include_pre_O3 = False
-flg_require_H = True
-
 #SUGAR_MARK = "'"
-#LIBPDBAA = BASE_DIR + 'DNA_FRAG_AA/'
-#LISTFILE = BASE_DIR + 'DNA.nts'
+#LIBPDBAA = BASE_DIR + 'RNA09_FRAG_AA/'
+#LISTFILE = BASE_DIR + 'RNA09.nts'
+#
+#mol_type = "RNA"
+#flg_include_pre_O3 = False
+#flg_require_H = True
 
-#mol_type = "DNA"
+SUGAR_MARK = "'"
+LIBPDBAA = BASE_DIR + 'DNA_FRAG_AA/'
+LISTFILE = BASE_DIR + 'DNA.nts'
+
+mol_type = "DNA"
 #flg_include_pre_O3 = True
-#flg_require_H = False
+flg_require_H = False
 
 
 
@@ -87,10 +87,11 @@ for l in open(LISTFILE):
     chains = pdb.read_all()
     pdb.close()
 
-    if flg_include_pre_O3:
-        offset = 1
-    else:
-        offset = 0
+    #if flg_include_pre_O3:
+    #    offset = 1
+    #else:
+    #    offset = 0
+    offset = 0
 
     r1 = chains[0].residues[offset+0]
     r2 = chains[0].residues[offset+1]
@@ -99,11 +100,11 @@ for l in open(LISTFILE):
     c = Chain()
 
     ############ O3' atom of Residue 0 (if exists) ###########
-    if flg_include_pre_O3:
-        r = Residue()
-        r.push_atom( generate_atom(chains[0].residues[0], ("O3'", "O3*" ), " O3'", 1, 0, ' O') )
-
-        c.push_residue(r)
+    #if flg_include_pre_O3:
+    #    r = Residue()
+    #    r.push_atom( generate_atom(chains[0].residues[0], ("O3'", "O3*" ), " O3'", 1, 0, ' O') )
+    #
+    #    c.push_residue(r)
 
     ################# Backbone of Residue 1 ####################
     r = Residue()

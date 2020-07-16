@@ -677,3 +677,6 @@ if __name__ == "__main__":
     f_out.write('# Final: %i\n' % sum(flg_final))
     f_out.write('#     2: %i\n' % puckers.count(2))
     f_out.write('#     3: %i\n' % puckers.count(3))
+
+    f_out.close()
+    f_final.close()

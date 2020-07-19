@@ -84,7 +84,7 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
 
-    if args.model == 'TIARNA':
+    if args.model == 'TISRNA':
         LIBPDBAA = args.basedir + 'RNA09_FRAG_AA/'  # input
         LIBPDBCG = args.basedir + 'RNA09_FRAG_CG/'  # output
         LISTFILE = args.basedir + 'RNA09.nts'

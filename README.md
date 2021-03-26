@@ -8,6 +8,9 @@
 #### Requirements:
  * Numpy
  * Database has to be downloaded from https://www.dropbox.com/s/uuiif7di6vg8wex/RNA09_FRAG.tar.gz?dl=0
+ * fQCP https://github.com/naotohori/fQCP 
+   * Download and use command `make f2py`. A shared object `CalcROT.cpython-XX-XXXX.so` will be created.
+   * Put it into any directory that can be seen with `PYTHONPATH`, or `TIS2AA/TIS2AA/`.
 
 ````bash
  $ tis2aa.py  trna.cg.pdb  trna.log trna.aa.pdb

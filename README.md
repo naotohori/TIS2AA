@@ -3,29 +3,39 @@
 # TIS2AA
 ----
 
-### Getting started
-
 #### Requirements:
  * Numpy
- * Database has to be downloaded from https://www.dropbox.com/s/uuiif7di6vg8wex/RNA09_FRAG.tar.gz?dl=0
- * fQCP https://github.com/naotohori/fQCP 
-   * Download and use command `make f2py`. A shared object `CalcROT.cpython-XX-XXXX.so` will be created.
-   * Put it into any directory that can be seen with `PYTHONPATH`, or `TIS2AA/ti2aa/`.
+ * Fortran compiler
+ * For minimization, AmberTools (https://ambermd.org/AmberTools.php) is required.
 
-## Download procedure
+## Getting started
 
-1. Clone the repository including submodules.
+### 1. Clone the repository including submodules.
 
 ```sh
 $ git clone --recurse-submodule https://github.com/naotohori/TIS2AA 
 ```
 
-2. Library preparation.
+If you already clone this repository without submodules, use the following command inside the directory.
+
+```sh
+$ git submodule update --init
+```
+
+### 2. Library preparation.
 
 ```sh
 $ cd TIS2AA/tis2aa/fQCP
 $ make f2py
 $ cd ../..
+```
+
+A shared object `CalcROT.cpython-XX-XXXX.so` will be created. 
+
+### 3. Download fragment libraries
+
+```sh
+$ curl -L https://www.dropbox.com/s/uuiif7di6vg8wex/RNA09_FRAG.tar.gz | tar zx
 ```
 
 ## Usage

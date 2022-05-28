@@ -13,7 +13,7 @@ from coord import Coord
 from pdbfile import PdbFile
 from torsion import torsion
 from mtx_coord_transform import mtx_crd_transform
-from CalcROT import calcrotation
+from fQCP.CalcROT import calcrotation
 
 ################################################################################
 """ Selection of a database """

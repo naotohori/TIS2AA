@@ -7,7 +7,7 @@ import numpy as np
 from pdbfile import PdbFile
 from pdb_elements import Chain, Residue
 from mtx_coord_transform import mtx_crd_transform
-from CalcROT import calcrotation
+from fQCP.CalcROT import calcrotation
 
 
 BASE_DIR = os.path.dirname(os.path.realpath(__file__)) + '/../'

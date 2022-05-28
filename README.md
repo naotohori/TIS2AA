@@ -16,7 +16,7 @@
 $ git clone --recurse-submodule https://github.com/naotohori/TIS2AA 
 ```
 
-If you already clone this repository without submodules, use the following command inside the directory.
+If you already have this repository without submodules, use the following command inside the directory.
 
 ```sh
 $ git submodule update --init

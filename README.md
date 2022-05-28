@@ -25,7 +25,7 @@ $ git submodule update --init
 ### 2. Library preparation.
 
 ```sh
-$ cd TIS2AA/tis2aa/fQCP
+$ cd TIS2AA/bin/fQCP
 $ make f2py
 $ cd ../..
 ```

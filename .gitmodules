@@ -1,3 +1,3 @@
-[submodule "tis2aa/fQCP"]
+[submodule "bin/fQCP"]
 	path = bin/fQCP
 	url = https://github.com/naotohori/fQCP.git

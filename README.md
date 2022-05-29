@@ -36,15 +36,20 @@ A shared object `CalcROT.cpython-XX-XXXX.so` will be created.
 
 ```sh
 $ curl -L https://www.dropbox.com/s/uuiif7di6vg8wex/RNA09_FRAG.tar.gz | tar zx
-$ curl -L https://www.dropbox.com/s/5mxp18qsn568p23/DNA_FRAG.tar.gz | tar zx
+$ curl -L https://www.dropbox.com/s/n8j5smkxp09ace9/DNA_FRAG.tar.gz | tar zx
 ```
 
 ## Usage
 
-````bash
- $ tis2aa.py  trna.cg.pdb  trna.log trna.aa.pdb
- $ min.py  trna.aa.pdb  trna.aa.min.pdb
+````sh
+ $ TIS2AA/bin/tis2aa.py  trna.cg.pdb  trna.log trna.aa.pdb
+ $ TIS2AA/bin/min.py  trna.aa.pdb  trna.aa.min.pdb
 ````
+
+For DNA, add `--model TISDNA` as follows.
+```sh
+$ .TIS2AA/bin/tis2aa.py --model TISDNA 1wqz.cg.pdb 1wqz.aa.pdb
+```
 
 ----
 #### References

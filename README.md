@@ -36,6 +36,7 @@ A shared object `CalcROT.cpython-XX-XXXX.so` will be created.
 
 ```sh
 $ curl -L https://www.dropbox.com/s/uuiif7di6vg8wex/RNA09_FRAG.tar.gz | tar zx
+$ curl -L https://www.dropbox.com/s/5mxp18qsn568p23/DNA_FRAG.tar.gz | tar zx
 ```
 
 ## Usage
